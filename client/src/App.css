@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'YanoneKaffeesatz';
+  src: local('YanoneKaffeesatz'), url(./Fonts/YanoneKaffeesatz-ExtraLight.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'LuckiestGuy';
+  src: local('LuckiestGuy'), url(./Fonts/LuckiestGuy-Regular.ttf) format('truetype');
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body, html, #root {
+  height: 100%;
+}
