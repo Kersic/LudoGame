@@ -14,11 +14,7 @@ const handleConnection = (socket, io) => {
                     socket.join(userRoom.id);
                     callback();
                     if(gameStarted) {
-                        socket.emit('message', { user: null, text: `Welcome ${user.username}! Guess what other players are drawing with typing the exact word into the chat.`});
-                        socket.emit('nextPlayerCountdown', { currentPlayer: userRoom.currentPlayer ? userRoom.currentPlayer.username: null, time: 0, gamesPlayed: userRoom.gamesPlayed});
-                        if(userRoom.currentPlayer && user.username === userRoom.currentPlayer.username){
-                            socket.emit('currentWord', userRoom.currentWord);
-                        }
+                        socket.emit('message', { user: null, text: `Welcome ${user.username}!`});
                     }
 
                     if(userRoom.users.filter(i=>i.active).length >= 4){
@@ -52,17 +48,6 @@ const handleConnection = (socket, io) => {
             io.to(roomId).emit('message', { user: tokenData.user.username, text: message });
             callback();
 
-            try{
-                if(message.toLowerCase() === room.currentWord.toLowerCase()){
-                    userModel.findOne({_id: tokenData.user._id})
-                        .then(user => {
-                            if(room.currentPlayer && user.username !== room.currentPlayer.username)
-                                showResultAndGivePoints(io, roomId, user);
-                        })
-                }
-            } catch (e) {
-                //console.log(e);
-            }
         }, (err) => {
             return callback(err);
         });
@@ -92,14 +77,6 @@ const handleConnection = (socket, io) => {
         }, (err) => {
             return callback(err);
         });
-    });
-
-    socket.on('canvasData', ({token, roomId, canvasData}) => {
-        getDataFromToken(token, (tokenData) => {
-            const { isDrawing, error } = isUserDrawing(roomId, tokenData.user);
-            if(error || !isDrawing) return;
-            socket.broadcast.to(roomId).emit('canvasDataUpdate', canvasData);
-        })
     });
 
     socket.on('disconnect', () => {

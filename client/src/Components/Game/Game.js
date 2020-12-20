@@ -40,45 +40,6 @@ const useStyles = createUseStyles({
         marginTop: `-${infoBoxSizes/2}px`,
         marginBottom: `-${infoBoxSizes/2}px`,
     },
-    numOfGames: {
-        backgroundColor: orange,
-        height: "100%",
-        width: "140px",
-        borderBottomRightRadius: cornerRadius,
-        boxShadow: shadowButtonRight,
-        ...center,
-        justifyContent: "start",
-        paddingLeft: "60px",
-    },
-    timeWrapper: {
-        backgroundColor: red,
-        height: "100%",
-        width: "140px",
-        ...aboveBreakpoint(breakpoint4, {
-            borderBottomRightRadius: cornerRadius,
-            width: "150px",
-        }),
-        borderBottomLeftRadius: cornerRadius,
-        boxShadow: shadowButtonLeft,
-        ...center,
-    },
-    wordToDraw: {
-        backgroundColor: blue,
-        height: "100%",
-        width: "200px",
-        borderTopRightRadius: cornerRadius,
-        boxShadow: shadowButtonRight,
-        textTransform: "uppercase",
-        ...center,
-        justifyContent: "start",
-        paddingLeft: "30px",
-        textShadow: textShadow,
-    },
-    topRightBox: {
-        ...belowBreakpoint(breakpoint4, {
-            display: "none",
-        })
-    },
     sideBoxes: {
         zIndex: 5,
         pointerEvents: "none",
@@ -193,17 +154,11 @@ const Game = ({location}) => {
     const history = useHistory();
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState([]);
-    const [time, setTime] = useState("");
-    const [nextGameTime, setNextGameTime] = useState(0);
     const [currentPlayer, setCurrentPlayer] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
-    const [currentWord, setCurrentWord] = useState("");
-    const [gamesPlayed, setGamesPlayed] = useState("");
     const [gameFinished, setGameFinished] = useState(false);
-    const [drawingPanelData, setDrawingPanelData] = useState("");
     const [users, setUsers] = useState([]);
     const { id } = queryString.parse(location.search);
-    const saveableCanvas = useRef(null);
 
     useEffect(() => {
         socket = io(serverURL);
@@ -226,31 +181,8 @@ const Game = ({location}) => {
         socket.on('message', message => {
             setMessages(messages => [ ...messages, message ]);
         });
-        socket.on('timeCountdown', data => {
-            setTime(data.time);
-            setUsers(data.users);
-        });
-        socket.on('nextPlayerCountdown', data => {
-            setNextGameTime(data.time);
-            setCurrentPlayer(data.currentPlayer);
-            if(data.time > 0)
-                setAlertMessage("Next Player: " + data.currentPlayer);
-            else
-                setAlertMessage("");
-            setGamesPlayed(data.gamesPlayed);
-        });
-        socket.on('currentWord', word => {
-            setCurrentWord(word);
-            setGamesPlayed(null);
-        });
-        socket.on('roundFinished', () => {
-            saveableCanvas.current?.clear()
-            setCurrentWord(null);
-            setCurrentPlayer(null);
-        });
+
         socket.on('gameFinished', (winner) => {
-            saveableCanvas.current?.clear()
-            setCurrentWord(null);
             setGameFinished(true);
             if(winner)
                 setAlertMessage( "Winner is " + winner);
@@ -258,17 +190,9 @@ const Game = ({location}) => {
                 setAlertMessage( "Game ended in a tie");
 
         });
-        socket.on('canvasDataUpdate', (canvasData) => {
-            if(getUsername() === currentPlayer) return;
-            //saveableCanvas.current?.loadSaveData(canvasData);
-            setDrawingPanelData(canvasData);
-        });
         socket.on('result', (data) => {
             if(data.winner){
-                setAlertMessage(data.winner + " guessed correctly. Word was " + data.word);
-            }
-            else{
-                setAlertMessage("Word was " + data.word);
+                setAlertMessage(data.winner + " won!");
             }
         });
     }, []);

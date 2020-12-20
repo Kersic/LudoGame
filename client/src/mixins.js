@@ -5,6 +5,7 @@ export const orange = '#fec776';
 export const blue = '#6acee3';
 export const red = '#e45965';
 export const purple = '#904a6e';
+export const green = "#37c458";
 
 export const YanoneKaffeesatz = 'YanoneKaffeesatz, Arial, sans-serif';
 export const LuckiestGuy = 'LuckiestGuy, Arial, sans-serif';
