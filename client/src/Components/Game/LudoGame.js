@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     belowBreakpoint,
     breakpoint4,
@@ -11,13 +11,11 @@ import {
     white, LuckiestGuy
 } from "../../mixins";
 import {createUseStyles} from "react-jss";
+import Dice from "./Dice";
 
 const useStyles = createUseStyles({
     paper: {
         height: "100%",
-        //backgroundColor: white,
-        //borderRadius: cornerRadius,
-        //boxShadow: shadowAllDirections,
         ...center,
         flexDirection: "column",
     },
@@ -44,7 +42,7 @@ const useStyles = createUseStyles({
         ...center,
         fontFamily: LuckiestGuy,
         color: white,
-    },
+    }
 });
 
 const FiledType = {
@@ -54,6 +52,7 @@ const FiledType = {
     YELLOW: 4,
     BLUE: 5,
     EMPTY: 1,
+    DICE: 6,
 }
 
 const gameGrid = [
@@ -62,7 +61,7 @@ const gameGrid = [
     [0,0,0,0,1,3,1,0,0,0,0],
     [0,0,0,0,1,3,1,0,0,0,0],
     [2,1,1,1,1,3,1,1,1,1,1],
-    [1,2,2,2,2,0,5,5,5,5,1],
+    [1,2,2,2,2,6,5,5,5,5,1],
     [1,1,1,1,1,4,1,1,1,1,5],
     [0,0,0,0,1,4,1,0,0,0,0],
     [0,0,0,0,1,4,1,0,0,0,0],
@@ -73,7 +72,7 @@ const gameGrid = [
 const playersPositions = [
     {
         name: "Tadeja",
-        positions: [[4,0], [1,6], [1, 0], [1,1]],
+        positions: [[0,0], [0,1], [1, 0], [1,1]],
     },
     {
         name: "Saso",
@@ -91,6 +90,7 @@ const playersPositions = [
 
 const LudoGame = () => {
     const classes = useStyles();
+    const [diceValue, setDiceValue] = useState(1);
     return (
         <div className={classes.paper}>
             <div className={classes.gameGrid}>
@@ -122,6 +122,14 @@ const LudoGame = () => {
                        return (<div className={classes.filed} style={{backgroundColor: green}}> {player} </div>)
                     } else if(field === FiledType.EMPTY){
                         return (<div className={classes.filed} style={{backgroundColor: white}}> {player} </div>)
+                    } else if(field === FiledType.DICE){
+                        return (
+                            <Dice
+                                value={diceValue}
+                                setValue={setDiceValue}
+                                disabled={false}
+                            />
+                        )
                     } else {
                        return (<div/>)
                     }
