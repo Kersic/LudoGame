@@ -15,6 +15,7 @@ body {
 
 body, html, #root {
   height: 100%;
+  min-width: fit-content;
 }
 
 @keyframes spin {

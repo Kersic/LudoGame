@@ -26,9 +26,9 @@ const useStyles = createUseStyles({
     },
     filed: {
         backgroundColor: red,
-        height: "60px",
-        width: "60px",
-        borderRadius: "60px",
+        height: "50px",
+        width: "50px",
+        borderRadius: "50px",
         margin: "10px",
         boxShadow: textShadow,
         ...center,
@@ -72,7 +72,7 @@ const gameGrid = [
 const playersPositions = [
     {
         name: "Tadeja",
-        positions: [[0,0], [0,1], [1, 0], [1,1]],
+        positions: [[0,0], [6,1], [1, 0], [1,1]],
     },
     {
         name: "Saso",

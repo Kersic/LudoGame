@@ -91,7 +91,7 @@ const Dashboard = () => {
     const {logout} = useAuth();
 
     return (
-        <BackgroundWrapper title={"DRAW AND GUESS"} backAction={logout} showProfile={true}>
+        <BackgroundWrapper title={"LUDO"} backAction={logout} showProfile={true}>
             <div className={classes.gamesWrapper}>
                 <div className={classes.gameBox} onClick={()=> !addingNewRoom ? setAddingNewRoom(true) : null}>
                     <RoomForm setAddingNewRoom={setAddingNewRoom} addingNewRoom={addingNewRoom} />

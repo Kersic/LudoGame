@@ -7,7 +7,7 @@ import {
     aboveBreakpoint, belowBreakpoint, blue,
     breakpoint2,
     breakpoint4, center, classNames,
-    cornerRadius,
+    cornerRadius, green,
     lightOrange, LuckiestGuy,
     orange, red, shadowAllDirections, shadowButtonLeft, shadowButtonRight, shadowTopLeft, textShadow,
     white,
@@ -25,7 +25,7 @@ const infoBoxSizes = 70;
 const useStyles = createUseStyles({
     background: {
         backgroundColor: lightOrange,
-        height: "100vh",
+        minHeight: "100vh",
         display: "grid",
         ...aboveBreakpoint(breakpoint4, {
             gridTemplateColumns: "7fr 3fr",
@@ -50,23 +50,45 @@ const useStyles = createUseStyles({
         justifyContent: "space-between",
         textShadow: textShadow,
     },
+    nameBox: {
+        height: "100%",
+        width: "140px",
+        boxShadow: shadowButtonRight,
+        ...center,
+        justifyContent: "start",
+        textTransform: "uppercase"
+    },
+    topLeft:{
+        backgroundColor: red,
+        borderBottomRightRadius: cornerRadius,
+        paddingLeft: "60px",
+    },
+    topRight:{
+        backgroundColor: green,
+        borderBottomLeftRadius: cornerRadius,
+        paddingLeft: "60px",
+    },
+    bottomRight:{
+        backgroundColor: blue,
+        borderTopLeftRadius: cornerRadius,
+        paddingLeft: "60px",
+    },
+    bottomLeft:{
+        backgroundColor: orange,
+        borderTopRightRadius: cornerRadius,
+        paddingLeft: "60px",
+    },
     leftColumn: {
         display: "grid",
         gridTemplateRows: `${infoBoxSizes}px auto ${infoBoxSizes}px`,
-        ...belowBreakpoint(breakpoint4, {
-            minHeight: window.innerWidth * 1.3,
-        })
     },
     rightColumn: {
         boxShadow: shadowTopLeft,
         display: "grid",
         gridTemplateRows: `50fr ${chatWrapperSize}px 50fr`,
         backgroundColor: orange,
-        ...belowBreakpoint(breakpoint4, {
-            minHeight: "700px",
-        }),
         zIndex: 5,
-        height: "100vh",
+        minHeight: "100vh",
     },
     chatWrapper: {
         backgroundColor: orange,
@@ -81,9 +103,7 @@ const useStyles = createUseStyles({
         zIndex: 5,
         borderTopLeftRadius: cornerRadius,
         borderBottomLeftRadius: cornerRadius,
-        ...aboveBreakpoint(breakpoint4, {
-            marginLeft: `-${20}px`,
-        }),
+        marginLeft: `-${20}px`,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -131,7 +151,7 @@ const useStyles = createUseStyles({
         backgroundColor: white,
         ...center,
         fontFamily: LuckiestGuy,
-        color: orange,
+        color: red,
         boxShadow: textShadow,
         paddingTop: "2px",
         fontSize: "15px",
@@ -144,6 +164,9 @@ const useStyles = createUseStyles({
         zIndex: 10,
         left: "10px",
     },
+    currentPlayer: {
+        textDecoration: "underline"
+    }
 });
 
 let socket;
@@ -214,10 +237,23 @@ const Game = ({location}) => {
             <div className={classes.logout} onClick={() => history.push('/')}>X</div>
             <div className={classes.leftColumn}>
                 <div className={classes.sideBoxes}>
-
+                    <div className={classNames(classes.topLeft, classes.nameBox)}>
+                        Tadeja
+                    </div>
+                    <div className={classNames(classes.topRight, classes.nameBox, classes.currentPlayer)}>
+                        Saso
+                    </div>
                 </div>
                 <div className={classes.paper}>
                     <LudoGame />
+                </div>
+                <div className={classes.sideBoxes}>
+                    <div className={classNames(classes.bottomLeft, classes.nameBox)}>
+                        Maja
+                    </div>
+                    <div className={classNames(classes.bottomRight, classes.nameBox)}>
+                        Klemen
+                    </div>
                 </div>
             </div>
 

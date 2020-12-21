@@ -10,7 +10,7 @@ import {classNames} from "../../mixins";
 
 const useStyles = createUseStyles({
     image: {
-        height: "60px",
+        height: "50px",
         margin: "10px",
         cursor: "pointer",
         "-webkit-filter": "drop-shadow(1px 1px 1px black)",

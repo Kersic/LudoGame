@@ -44,7 +44,7 @@ const Login = () => {
     return (
         <div className={classes.background}>
             <div className={classes.paper}>
-                <div className={classes.title}>DRAW AND GUESS</div>
+                <div className={classes.title}>LUDO</div>
                 {alert && typeof alert === "string" && <div className={classes.alert}>{alert.toUpperCase()}</div>}
                 <div className={classes.input}>
                     <div>EMAIL</div>
