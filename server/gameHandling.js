@@ -52,14 +52,13 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
         }
     )
 
-    if(room.firstPlayerSelected === false && firstDiceValuesNum === room.users.filter(user => user.active).length){
+    if(!room.firstPlayerSelected && firstDiceValuesNum === room.users.filter(user => user.active).length) {
         setFirstPayer(room, io);
         room.firstPlayerSelected = true;
-        return callback(newValue);
-    } else {
+    } else if (room.firstPlayerSelected) {
         socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
-        return callback(newValue);
     }
+    return callback(newValue);
 }
 
 const setFirstPayer = (room, io) => {

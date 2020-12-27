@@ -225,11 +225,11 @@ const Game = ({location}) => {
             }
         });
 
-        socket.on('currentPlayerRolledDice', (value) => {
-            console.log(value);
+        socket.on('currentPlayerRolledDice', (data) => {
+            setIsDiceRolling(true);
             setTimeout(function(){
                 setIsDiceRolling(false);
-                setDiceValue(value);
+                setDiceValue(data.value);
             }, 1000);
         });
 
