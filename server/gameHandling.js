@@ -2,9 +2,12 @@ const {getRoom, removeRoom} = require('./rooms');
 const {getTimeStringFromSeconds} = require('./helperFunctions');
 const {words} = require('./words');
 const userModel = require('./Models/user');
+const {getNextPlayer} = require("./ludoBoard");
+const {getNumberOfRolls} = require("./ludoBoard");
+const {hasFiguresOnField} = require("./ludoBoard");
 const {isUserInRoom} = require("./rooms");
 
-const {getStartPositions, PlayerColor} = require('./ludoBoard');
+const {getInitialsPositions, PlayerColor} = require('./ludoBoard');
 
 const handleGame = (socket, io, roomId) => {
     console.log("handle game");
@@ -28,10 +31,14 @@ const handleGame = (socket, io, roomId) => {
                     break;
 
             }
-            player.positions = getStartPositions(player.color);
+            player.positions = getInitialsPositions(player.color);
         })
-        io.to(roomId).emit('gameState', {users: room.users, currentPlayer: null});
+        sendGameState(io, room, true);
     }, 500);
+}
+
+const sendGameState = (io, room, canRollDice) => {
+    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: canRollDice});
 }
 
 const rollDice = (roomId, tokenUser, callback, io, socket) => {
@@ -39,6 +46,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     if(error) return callback(error);
 
     const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
+    console.log(tokenUser.username + " rolled " + newValue);
 
     let firstDiceValuesNum = 0
     room.users.map(user => {
@@ -55,13 +63,17 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     if(!room.firstPlayerSelected && firstDiceValuesNum === room.users.filter(user => user.active).length) {
         setFirstPayer(room, io);
         room.firstPlayerSelected = true;
+    } else if (!room.firstPlayerSelected) {
+        socket.emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: false});
     } else if (room.firstPlayerSelected) {
         socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
+        handlePossibleActions(newValue, room, io, socket)
     }
     return callback(newValue);
 }
 
 const setFirstPayer = (room, io) => {
+    console.log("set first player");
     let firstUser = null;
     room.users.map(user => {
         if(firstUser === null || user.firstDiceValue > firstUser.firstDiceValue) {
@@ -69,8 +81,36 @@ const setFirstPayer = (room, io) => {
         }
     });
     room.currentPlayer = firstUser;
-    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer});
+    room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
+    console.log(room.currentPlayer.username + " has " + room.currentPlayerRollsLeft + " rolls left");
+    sendGameState(io, room, true);
     io.to(room.id).emit('message', { user: null, text: "First player is " + firstUser.username });
+}
+
+const handlePossibleActions = (newValue, room, io, socket) => {
+    console.log("handle possible actions");
+    if (newValue === 6) {
+        console.log("rolled 6");
+        // prestavi igralca na polju ali prestavi gralca iz hise
+        // meci se enkrat
+    } else if(hasFiguresOnField(room.currentPlayer)) {
+        console.log("has figures on filed");
+        // prestavi igralca na polju
+    } else if (room.currentPlayerRollsLeft > 0) {
+       // sendGameState(io, room, true);
+    }
+
+    room.currentPlayerRollsLeft = room.currentPlayerRollsLeft - 1;
+    console.log(room.currentPlayerRollsLeft + " rolls left");
+    if (room.currentPlayerRollsLeft <= 0) {
+        room.currentPlayer = getNextPlayer(room);
+        room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
+        sendGameState(io, room, true);
+    }
+}
+
+const handleMove = () => {
+    // set next or sam player
 }
 
 // const nextPlayerCountDown = (io, roomId) => {

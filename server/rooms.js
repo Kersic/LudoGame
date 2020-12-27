@@ -7,6 +7,8 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
+        currentPlayerRollsLeft: 0,
+        canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
     },
     {
@@ -15,6 +17,8 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
+        currentPlayerRollsLeft: 0,
+        canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
     },
     {
@@ -23,6 +27,8 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
+        currentPlayerRollsLeft: 0,
+        canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
     },
     {
@@ -31,6 +37,8 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
+        currentPlayerRollsLeft: 0,
+        canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
     },
 ];

@@ -181,7 +181,7 @@ const Game = ({location}) => {
     const history = useHistory();
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState([]);
-    const [currentPlayer, setCurrentPlayer] = useState("");
+    const [currentPlayer, setCurrentPlayer] = useState(null);
     const [alertMessage, setAlertMessage] = useState("");
     const [gameFinished, setGameFinished] = useState(false);
     const [users, setUsers] = useState([]);
@@ -217,11 +217,19 @@ const Game = ({location}) => {
         });
 
         socket.on('gameState', (gameState) => {
+            console.log("gameState");
             console.log(gameState);
             setUsers(gameState.users);
             setCurrentPlayer(gameState.currentPlayer)
-            if(!gameState.currentPlayer || getUsername() === gameState.currentPlayer.username) {
+            if(!gameState.canRollDice) {
+                setDiceEnabled(false);
+                console.log("disable dice");
+            }
+            else if(!gameState.currentPlayer || (getUsername() === gameState.currentPlayer.username && gameState.canRollDice)) {
                 setDiceEnabled(true);
+                console.log("enable dice");
+            } else {
+                setDiceEnabled(false);
             }
         });
 
@@ -256,13 +264,12 @@ const Game = ({location}) => {
     }, [users])
 
     useEffect(() => {
-        if(isDiceRolling) {
+        if(isDiceRolling && diceEnabled) {
+            console.log("roll dice");
             socket.emit('rollDice', {token: getToken(), roomId: id}, (value) => {
-                console.log(value);
                 setTimeout(function(){
                     setIsDiceRolling(false);
                     setDiceValue(value);
-                    setDiceEnabled(false);
                 }, 1000);
             });
         }

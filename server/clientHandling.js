@@ -16,7 +16,7 @@ const handleConnection = (socket, io) => {
                     callback();
                     if(gameStarted) {
                         socket.emit('message', { user: null, text: `Welcome ${user.username}! Roll a dice! The player with highest number will start.`});
-                        socket.emit('gameState', {users: userRoom.users, currentPlayer: null});
+                       // socket.emit('gameState', {users: userRoom.users, currentPlayer: userRoom.currentPlayer});
                     }
 
                     if(userRoom.users.filter(i=>i.active).length >= 4){
