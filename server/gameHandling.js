@@ -33,12 +33,13 @@ const handleGame = (socket, io, roomId) => {
             }
             player.positions = getInitialsPositions(player.color);
         })
-        sendGameState(io, room, true);
+        room.canCurrentPlayerRollDice = true;
+        sendGameState(io, room);
     }, 500);
 }
 
-const sendGameState = (io, room, canRollDice) => {
-    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: canRollDice});
+const sendGameState = (io, room) => {
+    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: room.canCurrentPlayerRollDice});
 }
 
 const rollDice = (roomId, tokenUser, callback, io, socket) => {
@@ -83,7 +84,8 @@ const setFirstPayer = (room, io) => {
     room.currentPlayer = firstUser;
     room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
     console.log(room.currentPlayer.username + " has " + room.currentPlayerRollsLeft + " rolls left");
-    sendGameState(io, room, true);
+    room.canCurrentPlayerRollDice = true;
+    sendGameState(io, room);
     io.to(room.id).emit('message', { user: null, text: "First player is " + firstUser.username });
 }
 
@@ -105,7 +107,8 @@ const handlePossibleActions = (newValue, room, io, socket) => {
     if (room.currentPlayerRollsLeft <= 0) {
         room.currentPlayer = getNextPlayer(room);
         room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
-        sendGameState(io, room, true);
+        room.canCurrentPlayerRollDice = true;
+        sendGameState(io, room);
     }
 }
 
