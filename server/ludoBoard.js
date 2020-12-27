@@ -1,3 +1,4 @@
+const {getIndexOfPointInPath} = require("./helperFunctions");
 const PlayerColor = {
     RED: 'red',
     GREEN: 'green',
@@ -51,9 +52,9 @@ const getHomePositions = (playerColor) => {
         case PlayerColor.GREEN:
             return [[1, 5], [2, 5], [3, 5], [4, 5]];
         case PlayerColor.YELLOW:
-            return [[6, 5], [7, 5], [8, 5], [9, 5]];
+            return [[9, 5], [8, 5], [7, 5], [6, 5]];
         case PlayerColor.BLUE:
-            return [[5, 6], [5, 7], [5, 8], [5, 9]];
+            return [[5, 9], [5, 8], [5, 7], [5, 6]];
     }
 }
 
@@ -67,6 +68,39 @@ const gamePath = [
     [6, 10], [6, 9], [6, 8], [6, 7], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [10, 5],
     [10, 4], [9, 4], [8, 4], [7, 4], [6, 4], [6, 3], [6, 2], [6, 1], [6, 0], [5, 0],
 ];
+
+const PlayerPath = (playerColor) => {
+    let playerPath = [];
+
+    const startIndex = getIndexOfPointInPath(gamePath, getStartPosition(playerColor));
+
+    for(let i = startIndex; i < gamePath.length; i++){
+        playerPath.push(gamePath[i]);
+    }
+    for(let i = 0; i < startIndex; i++){
+        playerPath.push(gamePath[i]);
+    }
+    playerPath = playerPath.concat(getHomePositions(playerColor));
+
+    return playerPath;
+}
+
+const getPathToNewPosition = (startPosition, numOfMoves, playerColor) => {
+    let movePath = [];
+    let playerPath = PlayerPath(playerColor);
+    console.log(playerPath);
+
+    const startIndex = getIndexOfPointInPath(playerPath, startPosition);
+
+    if(startIndex+numOfMoves >= playerPath.length)
+        return {path: [], error: true}
+
+    for(let i = startIndex; i <= startIndex+numOfMoves; i++){
+        movePath.push(playerPath[i]);
+    }
+
+    return {path: movePath, error: false}
+}
 
 const hasFiguresOnField = (player) => {
     player.positions.map(position => {
@@ -111,4 +145,4 @@ const getNextPlayer = (room) => {
     return room.users[currentIndex];
 }
 
-module.exports =  {PlayerColor, getInitialsPositions, getHomePositions, getStartPosition, getStopPosition, hasFiguresOnField, getNumberOfRolls, getNextPlayer}
+module.exports =  {PlayerColor, getInitialsPositions, getHomePositions, getStartPosition, getStopPosition, hasFiguresOnField, getNumberOfRolls, getNextPlayer, getPathToNewPosition}

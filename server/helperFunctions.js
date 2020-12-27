@@ -40,4 +40,14 @@ const arrayOfPointsIncludes = (array, point) => {
     return includes;
 }
 
-module.exports = {verifyToken, getDataFromToken, arrayOfPointsIncludes}
+const getIndexOfPointInPath = (array, point) => {
+    let index = -1
+    array.map((p, idx) => {
+        if(p[0] === point[0] && p[1] === point[1]){
+            index = idx;
+        }
+    })
+    return index;
+}
+
+module.exports = {verifyToken, getDataFromToken, arrayOfPointsIncludes, getIndexOfPointInPath}

@@ -2,6 +2,7 @@ const {getRoom, removeRoom} = require('./rooms');
 const {getTimeStringFromSeconds} = require('./helperFunctions');
 const {words} = require('./words');
 const userModel = require('./Models/user');
+const {getPathToNewPosition} = require("./ludoBoard");
 const {arrayOfPointsIncludes} = require("./helperFunctions");
 const {getHomePositions} = require("./ludoBoard");
 const {getStartPosition} = require("./ludoBoard");
@@ -144,10 +145,16 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
         } else {
             return callback({ error: "Can not move this figure." });
         }
-    } else if (getHomePositions(currentPlayerColor).includes(playerPosition)) {
-        // move in hom if possible
     } else {
-        // move by path if possible
+        const result = getPathToNewPosition(playerPosition, room.currentDiceValue, currentPlayerColor)
+        if(result.error){
+            return callback({ error: "Can not move this figure." });
+        } else {
+            console.log("move path");
+            console.log(result.path);
+            room.currentPlayer.positions.splice(figureIndex, 1);
+            room.currentPlayer.positions.push(result.path[result.path.length-1]);
+        }
     }
 
     callback();
