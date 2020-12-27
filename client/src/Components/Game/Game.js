@@ -18,6 +18,7 @@ import Chat from "../Chat/Chat";
 import useAuth from "../../Hooks/useAuth";
 import {useHistory} from "react-router-dom";
 import LudoGame from "./LudoGame";
+import {PlayerColor} from "../../enums";
 
 const chatWrapperSize = 50;
 const infoBoxSizes = 70;
@@ -88,7 +89,7 @@ const useStyles = createUseStyles({
         gridTemplateRows: `50fr ${chatWrapperSize}px 50fr`,
         backgroundColor: orange,
         zIndex: 5,
-        minHeight: "100vh",
+        height: "100vh",
     },
     chatWrapper: {
         backgroundColor: orange,
@@ -166,6 +167,9 @@ const useStyles = createUseStyles({
     },
     currentPlayer: {
         textDecoration: "underline"
+    },
+    inactive: {
+        opacity: "0.4"
     }
 });
 
@@ -182,6 +186,13 @@ const Game = ({location}) => {
     const [gameFinished, setGameFinished] = useState(false);
     const [users, setUsers] = useState([]);
     const { id } = queryString.parse(location.search);
+    const [redUser, setRedUser] = useState(null);
+    const [greenUser, setGreenUser] = useState(null);
+    const [yellowUser, setYellowUser] = useState(null);
+    const [blueUser, setBluseUser] = useState(null);
+    const [isDiceRolling, setIsDiceRolling] = useState(false);
+    const [diceValue, setDiceValue] = useState(1);
+    const [diceEnabled, setDiceEnabled] = useState(true);
 
     useEffect(() => {
         socket = io(serverURL);
@@ -205,6 +216,23 @@ const Game = ({location}) => {
             setMessages(messages => [ ...messages, message ]);
         });
 
+        socket.on('gameState', (gameState) => {
+            console.log(gameState);
+            setUsers(gameState.users);
+            setCurrentPlayer(gameState.currentPlayer)
+            if(!gameState.currentPlayer || getUsername() === gameState.currentPlayer.username) {
+                setDiceEnabled(true);
+            }
+        });
+
+        socket.on('currentPlayerRolledDice', (value) => {
+            console.log(value);
+            setTimeout(function(){
+                setIsDiceRolling(false);
+                setDiceValue(value);
+            }, 1000);
+        });
+
         socket.on('gameFinished', (winner) => {
             setGameFinished(true);
             if(winner)
@@ -220,6 +248,26 @@ const Game = ({location}) => {
         });
     }, []);
 
+    useEffect(() => {
+        setRedUser(users.filter(user => user.color === PlayerColor.RED).length > 0 ? users.filter(user => user.color === PlayerColor.RED)[0] : null);
+        setGreenUser(users.filter(user => user.color === PlayerColor.GREEN).length > 0 ? users.filter(user => user.color === PlayerColor.GREEN)[0] : null);
+        setYellowUser(users.filter(user => user.color === PlayerColor.YELLOW).length > 0 ? users.filter(user => user.color === PlayerColor.YELLOW)[0] : null);
+        setBluseUser(users.filter(user => user.color === PlayerColor.RED).length > 0 ? users.filter(user => user.color === PlayerColor.BLUE)[0] : null);
+    }, [users])
+
+    useEffect(() => {
+        if(isDiceRolling) {
+            socket.emit('rollDice', {token: getToken(), roomId: id}, (value) => {
+                console.log(value);
+                setTimeout(function(){
+                    setIsDiceRolling(false);
+                    setDiceValue(value);
+                    setDiceEnabled(false);
+                }, 1000);
+            });
+        }
+    }, [isDiceRolling])
+
     const sendMessage = (event) => {
         event.preventDefault();
         if(message) {
@@ -232,28 +280,71 @@ const Game = ({location}) => {
         sendMessage(event);
     }
 
+    const isCurrentPlayer = (player) => {
+        if(!currentPlayer) return false;
+        return player.username === currentPlayer.username;
+    }
+
+    const isActive = (player) => {
+        return player.active;
+    }
+
     return (
         <div className={classes.background} onKeyDown={handleKeyDown}>
             <div className={classes.logout} onClick={() => history.push('/')}>X</div>
             <div className={classes.leftColumn}>
                 <div className={classes.sideBoxes}>
-                    <div className={classNames(classes.topLeft, classes.nameBox)}>
-                        Tadeja
-                    </div>
-                    <div className={classNames(classes.topRight, classes.nameBox, classes.currentPlayer)}>
-                        Saso
-                    </div>
+                    {redUser &&
+                    <div className={classNames(
+                                classes.topLeft,
+                                classes.nameBox,
+                                isCurrentPlayer(redUser) ? classes.currentPlayer : "",
+                                isActive(redUser) ? "" : classes.inactive,
+                            )}
+                    >
+                        {redUser.username}
+                    </div>}
+                    {greenUser &&
+                    <div className={classNames(
+                                classes.topRight,
+                                classes.nameBox,
+                                isCurrentPlayer(greenUser) ? classes.currentPlayer : "",
+                                isActive(greenUser) ? "" : classes.inactive,
+                            )}
+                    >
+                        {greenUser.username}
+                    </div>}
                 </div>
                 <div className={classes.paper}>
-                    <LudoGame />
+                    <LudoGame
+                        playersPositions={users}
+                        isDiceRolling={isDiceRolling}
+                        setIsDiceRolling={setIsDiceRolling}
+                        diceValue={diceValue}
+                        canRollDice={diceEnabled}
+                    />
                 </div>
                 <div className={classes.sideBoxes}>
-                    <div className={classNames(classes.bottomLeft, classes.nameBox)}>
-                        Maja
-                    </div>
-                    <div className={classNames(classes.bottomRight, classes.nameBox)}>
-                        Klemen
-                    </div>
+                    {yellowUser &&
+                    <div className={classNames(
+                            classes.bottomLeft,
+                            classes.nameBox,
+                            isCurrentPlayer(yellowUser) ? classes.currentPlayer : "",
+                            isActive(yellowUser) ? "" : classes.inactive,
+                        )}
+                    >
+                        {yellowUser.username}
+                    </div>}
+                    {blueUser &&
+                    <div className={classNames(
+                            classes.bottomRight,
+                            classes.nameBox,
+                            isCurrentPlayer(blueUser) ? classes.currentPlayer : "",
+                            isActive(blueUser) ? "" : classes.inactive,
+                        )}
+                    >
+                        {blueUser.username}
+                    </div>}
                 </div>
             </div>
 

@@ -25,9 +25,9 @@ const useStyles = createUseStyles({
     }
 })
 
-const Dice = ({value, setValue, disabled}) => {
+const Dice = ({value, disabled, isRolling, setIsRolling}) => {
     const classes = useStyles();
-    const [isRolling, setIsRolling] = useState(false);
+    //const [isRolling, setIsRolling] = useState(false);
 
     let srcImage = dice1;
     if(value === 2) srcImage = dice2;
@@ -37,13 +37,8 @@ const Dice = ({value, setValue, disabled}) => {
     if(value === 6) srcImage = dice6;
 
     const rollDice = () => {
-        if(isRolling) return;
-        const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
-        setIsRolling(true);
-        setTimeout(function(){
-            setIsRolling(false);
-            setValue(newValue);
-        }, 1000);
+        if(!disabled)
+            setIsRolling(true);
     }
 
     return (

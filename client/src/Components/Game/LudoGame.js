@@ -69,28 +69,27 @@ const gameGrid = [
     [4,4,0,0,4,1,1,0,0,5,5],
 ];
 
-const playersPositions = [
-    {
-        name: "Tadeja",
-        positions: [[0,0], [6,1], [1, 0], [1,1]],
-    },
-    {
-        name: "Saso",
-        positions: [[0,9], [0,10], [1, 9], [1,10]],
-    },
-    {
-        name: "Maja",
-        positions: [[9,0], [9,1], [10, 0], [10,1]],
-    },
-    {
-        name: "Klemen",
-        positions: [[9,9], [9,10], [10, 9], [10,10]],
-    },
-]
+// const playersPositions = [
+//     {
+//         name: "Tadeja",
+//         positions: [[0,0], [6,1], [1, 0], [1,1]],
+//     },
+//     {
+//         name: "Saso",
+//         positions: [[0,9], [0,10], [1, 9], [1,10]],
+//     },
+//     {
+//         name: "Maja",
+//         positions: [[9,0], [9,1], [10, 0], [10,1]],
+//     },
+//     {
+//         name: "Klemen",
+//         positions: [[9,9], [9,10], [10, 9], [10,10]],
+//     },
+// ]
 
-const LudoGame = () => {
+const LudoGame = ({playersPositions, isDiceRolling, setIsDiceRolling, diceValue, canRollDice}) => {
     const classes = useStyles();
-    const [diceValue, setDiceValue] = useState(1);
     return (
         <div className={classes.paper}>
             <div className={classes.gameGrid}>
@@ -99,7 +98,7 @@ const LudoGame = () => {
 
                     playersPositions.map((playerPositions, playerIndex) => playerPositions.positions.map(position => {
                         if(position[0] === rowIndex && position[1] === columnIndex) {
-                            const shortName = playerPositions.name.slice(0,2);
+                            const shortName = playerPositions.username.slice(0,2);
                             if(playerIndex === 0)
                                 player = <div className={classes.player} style={{backgroundColor: red}}>{shortName}</div>
                             else if (playerIndex === 1)
@@ -126,8 +125,9 @@ const LudoGame = () => {
                         return (
                             <Dice
                                 value={diceValue}
-                                setValue={setDiceValue}
-                                disabled={false}
+                                disabled={!canRollDice}
+                                isRolling={isDiceRolling}
+                                setIsRolling={setIsDiceRolling}
                             />
                         )
                     } else {

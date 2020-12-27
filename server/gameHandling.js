@@ -2,12 +2,76 @@ const {getRoom, removeRoom} = require('./rooms');
 const {getTimeStringFromSeconds} = require('./helperFunctions');
 const {words} = require('./words');
 const userModel = require('./Models/user');
+const {isUserInRoom} = require("./rooms");
 
-const playerTime = 3*60;
+const {getStartPositions, PlayerColor} = require('./ludoBoard');
 
 const handleGame = (socket, io, roomId) => {
     console.log("handle game");
-    //setTimeout(()=>nextPlayerCountDown(io, roomId), 1000);
+
+    setTimeout(()=> {
+        const {room} = getRoom(roomId);
+
+        room.users.map((player, playerIndex) => {
+            switch (playerIndex) {
+                case 0:
+                    player.color = PlayerColor.RED;
+                    break;
+                case 1:
+                    player.color = PlayerColor.GREEN;
+                    break;
+                case 2:
+                    player.color = PlayerColor.YELLOW;
+                    break;
+                case 3:
+                    player.color = PlayerColor.BLUE;
+                    break;
+
+            }
+            player.positions = getStartPositions(player.color);
+        })
+        io.to(roomId).emit('gameState', {users: room.users, currentPlayer: null});
+    }, 500);
+}
+
+const rollDice = (roomId, tokenUser, callback, io, socket) => {
+    const { error, room } = isUserInRoom(roomId, tokenUser);
+    if(error) return callback(error);
+
+    const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
+
+    let firstDiceValuesNum = 0
+    room.users.map(user => {
+            if(user.firstDiceValue === 0 && user.username === tokenUser.username){
+                user.firstDiceValue = newValue;
+                io.to(roomId).emit('message', { user: null, text: user.username + " rolled " + newValue });
+            }
+            if(user.firstDiceValue !== 0 && user.active){
+                firstDiceValuesNum++;
+            }
+        }
+    )
+
+    if(room.firstPlayerSelected === false && firstDiceValuesNum === room.users.filter(user => user.active).length){
+        setFirstPayer(room, io);
+        room.firstPlayerSelected = true;
+        return callback(newValue);
+    } else {
+        socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
+        return callback(newValue);
+    }
+}
+
+const setFirstPayer = (room, io) => {
+    let firstUser = null;
+    room.users.map(user => {
+        if(firstUser === null || user.firstDiceValue > firstUser.firstDiceValue) {
+            firstUser = user;
+        }
+    });
+    room.currentPlayer = firstUser;
+    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer});
+    io.to(room.id).emit('message', { user: null, text: "First player is " + firstUser.username });
 }
 
 // const nextPlayerCountDown = (io, roomId) => {
@@ -121,4 +185,4 @@ const showResultAndGivePoints = (io, roomId, user) => {
     // setTimeout(()=>nextPlayerCountDown(io, roomId), 4000);
 }
 
-module.exports = {handleGame, showResultAndGivePoints};
+module.exports = {handleGame, showResultAndGivePoints, rollDice};

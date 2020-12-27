@@ -7,10 +7,7 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
-        currentWord: "",
-        gamesPlayed: "",
-        countDown: null,
-        counter: 0,
+        firstPlayerSelected: false,
     },
     {
         id: uuid(),
@@ -18,10 +15,7 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
-        currentWord: "",
-        gamesPlayed: "",
-        countDown: null,
-        counter: 0,
+        firstPlayerSelected: false,
     },
     {
         id: uuid(),
@@ -29,10 +23,7 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
-        currentWord: "",
-        gamesPlayed: "",
-        countDown: null,
-        counter: 0,
+        firstPlayerSelected: false,
     },
     {
         id: uuid(),
@@ -40,10 +31,7 @@ const rooms = [
         users:[],
         hasStarted:false,
         currentPlayer: null,
-        currentWord: "",
-        gamesPlayed: "",
-        countDown: null,
-        counter: 0,
+        firstPlayerSelected: false,
     },
 ];
 
@@ -67,6 +55,9 @@ const addUserInRoom = ( socketId, user, roomId ) => {
             pointsThisGame: 0,
             hasPlayed: false,
             active: true,
+            positions: [],
+            color: null,
+            firstDiceValue: 0,
         }
         room.users.push(newUser);
         console.log("user added");
@@ -128,15 +119,15 @@ const isUserInRoom = (roomId, authData) => {
     return {userInRoom: true, room: room}
 }
 
-const isUserDrawing = (roomId, authData) => {
-    const room = rooms.find((room) => room.id === roomId);
-    if(!room) return { error: 'Room not found' };
-    if(!room.currentPlayer) return { error: 'No current user fund' };
-    if(room.currentPlayer && room.currentPlayer._id.toString() === authData._id.toString())
-        return { isDrawing: true }
-    else
-        return { isDrawing: false }
-}
+// const isUserDrawing = (roomId, authData) => {
+//     const room = rooms.find((room) => room.id === roomId);
+//     if(!room) return { error: 'Room not found' };
+//     if(!room.currentPlayer) return { error: 'No current user fund' };
+//     if(room.currentPlayer && room.currentPlayer._id.toString() === authData._id.toString())
+//         return { isDrawing: true }
+//     else
+//         return { isDrawing: false }
+// }
 
 const getRoom = (roomId) => {
     const room = rooms.find((room) => room.id === roomId);
@@ -165,7 +156,6 @@ module.exports = {
     startGame,
     isUserInRoom,
     getRoom,
-    isUserDrawing,
     removeRoom,
     removeInactivePlayersFromRoom
 };

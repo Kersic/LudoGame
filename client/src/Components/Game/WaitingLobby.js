@@ -149,7 +149,7 @@ const WaitingLobby = ({location}) => {
         <BackgroundWrapper title={room.name} backAction={history.goBack}>
             {room.id &&
                 <>
-                <div className={classes.message}>{activeUsers.length < 3 ? `Waiting for ${3-activeUsers.length} more players to join` : `Waiting for first player to start game`} </div>
+                <div className={classes.message}>{activeUsers.length < 2 ? `Waiting for ${2-activeUsers.length} more players to join` : `Waiting for first player to start game`} </div>
                 <div className={classes.roomDataWrapper}>
                     <div>
                         <div className={classes.playersTitle}>Players:</div>

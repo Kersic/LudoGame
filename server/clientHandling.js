@@ -1,5 +1,6 @@
 const {getDataFromToken} = require("./helperFunctions");
 const userModel = require('./Models/user');
+const {rollDice} = require("./gameHandling");
 const {addUserInRoom, removeUserFromRoom, setUserInactive, startGame, isUserInRoom, isUserDrawing, removeInactivePlayersFromRoom} = require('./rooms');
 const {handleGame, showResultAndGivePoints} = require('./gameHandling');
 
@@ -14,7 +15,8 @@ const handleConnection = (socket, io) => {
                     socket.join(userRoom.id);
                     callback();
                     if(gameStarted) {
-                        socket.emit('message', { user: null, text: `Welcome ${user.username}!`});
+                        socket.emit('message', { user: null, text: `Welcome ${user.username}! Roll a dice! The player with highest number will start.`});
+                        socket.emit('gameState', {users: userRoom.users, currentPlayer: null});
                     }
 
                     if(userRoom.users.filter(i=>i.active).length >= 4){
@@ -78,6 +80,14 @@ const handleConnection = (socket, io) => {
             return callback(err);
         });
     });
+
+    socket.on('rollDice', ({roomId, token}, callback) => {
+        getDataFromToken(token, (tokenData) => {
+            rollDice(roomId, tokenData.user, callback, io, socket);
+        }, (err) => {
+            return callback(err);
+        });
+    })
 
     socket.on('disconnect', () => {
         console.log("user has left");
