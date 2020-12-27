@@ -220,7 +220,8 @@ const Game = ({location}) => {
             console.log("gameState");
             console.log(gameState);
             setUsers(gameState.users);
-            setCurrentPlayer(gameState.currentPlayer)
+            setCurrentPlayer(gameState.currentPlayer);
+            setDiceValue(gameState.diceValue);
             if(!gameState.canRollDice) {
                 setDiceEnabled(false);
                 console.log("disable dice");

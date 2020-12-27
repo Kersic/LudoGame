@@ -39,7 +39,7 @@ const handleGame = (socket, io, roomId) => {
 }
 
 const sendGameState = (io, room) => {
-    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: room.canCurrentPlayerRollDice});
+    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: room.canCurrentPlayerRollDice, diceValue: room.currentDiceValue});
 }
 
 const rollDice = (roomId, tokenUser, callback, io, socket) => {
@@ -67,6 +67,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     } else if (!room.firstPlayerSelected) {
         socket.emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: false});
     } else if (room.firstPlayerSelected) {
+        room.currentDiceValue = newValue;
         socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
         handlePossibleActions(newValue, room, io, socket)
     }

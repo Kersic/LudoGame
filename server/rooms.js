@@ -10,6 +10,7 @@ const rooms = [
         currentPlayerRollsLeft: 0,
         canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
+        currentDiceValue: 1,
     },
     {
         id: uuid(),
@@ -20,6 +21,7 @@ const rooms = [
         currentPlayerRollsLeft: 0,
         canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
+        currentDiceValue: 1,
     },
     {
         id: uuid(),
@@ -30,6 +32,7 @@ const rooms = [
         currentPlayerRollsLeft: 0,
         canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
+        currentDiceValue: 1,
     },
     {
         id: uuid(),
@@ -40,6 +43,7 @@ const rooms = [
         currentPlayerRollsLeft: 0,
         canCurrentPlayerRollDice: true,
         firstPlayerSelected: false,
+        currentDiceValue: 1,
     },
 ];
 
