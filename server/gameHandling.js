@@ -2,6 +2,9 @@ const {getRoom, removeRoom} = require('./rooms');
 const {getTimeStringFromSeconds} = require('./helperFunctions');
 const {words} = require('./words');
 const userModel = require('./Models/user');
+const {arrayOfPointsIncludes} = require("./helperFunctions");
+const {getHomePositions} = require("./ludoBoard");
+const {getStartPosition} = require("./ludoBoard");
 const {getNextPlayer} = require("./ludoBoard");
 const {getNumberOfRolls} = require("./ludoBoard");
 const {hasFiguresOnField} = require("./ludoBoard");
@@ -39,7 +42,13 @@ const handleGame = (socket, io, roomId) => {
 }
 
 const sendGameState = (io, room) => {
-    io.to(room.id).emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: room.canCurrentPlayerRollDice, diceValue: room.currentDiceValue});
+    io.to(room.id).emit('gameState', {
+        users: room.users,
+        currentPlayer: room.currentPlayer,
+        canRollDice: room.canCurrentPlayerRollDice,
+        diceValue: room.currentDiceValue,
+        canMoveFigure: room.canCurrentPlayerMoveFigure,
+    });
 }
 
 const rollDice = (roomId, tokenUser, callback, io, socket) => {
@@ -65,7 +74,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
         setFirstPayer(room, io);
         room.firstPlayerSelected = true;
     } else if (!room.firstPlayerSelected) {
-        socket.emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: false});
+        socket.emit('gameState', {users: room.users, currentPlayer: room.currentPlayer, canRollDice: false, canMoveFigure: false});
     } else if (room.firstPlayerSelected) {
         room.currentDiceValue = newValue;
         socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
@@ -94,27 +103,55 @@ const handlePossibleActions = (newValue, room, io, socket) => {
     console.log("handle possible actions");
     if (newValue === 6) {
         console.log("rolled 6");
-        // prestavi igralca na polju ali prestavi gralca iz hise
-        // meci se enkrat
+        room.canCurrentPlayerRollDice = false;
+        room.canCurrentPlayerMoveFigure = true;
     } else if(hasFiguresOnField(room.currentPlayer)) {
         console.log("has figures on filed");
-        // prestavi igralca na polju
-    } else if (room.currentPlayerRollsLeft > 0) {
-       // sendGameState(io, room, true);
+    } else {
+        room.canCurrentPlayerRollDice = true;
+        room.canCurrentPlayerMoveFigure = false;
     }
 
     room.currentPlayerRollsLeft = room.currentPlayerRollsLeft - 1;
     console.log(room.currentPlayerRollsLeft + " rolls left");
-    if (room.currentPlayerRollsLeft <= 0) {
+    if (room.currentPlayerRollsLeft <= 0 && !room.canCurrentPlayerMoveFigure) {
         room.currentPlayer = getNextPlayer(room);
         room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
         room.canCurrentPlayerRollDice = true;
-        sendGameState(io, room);
     }
+
+    sendGameState(io, room);
 }
 
-const handleMove = () => {
-    // set next or sam player
+const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => {
+    console.log(playerPosition)
+    const { error, room } = isUserInRoom(roomId, tokenUser);
+    if(error) return callback(error);
+
+    if(room.currentPlayer.username !== tokenUser.username) return callback({error: 'Can not move another player figures'});
+
+    const currentPlayerColor = room.currentPlayer.color;
+    const figureIndex = room.currentPlayer.positions.findIndex((p) => p[0] === playerPosition[0] && p[1] === playerPosition[1]);
+
+    if(figureIndex === -1)  {
+        return callback({ error: "Can not move figure. Figure not found" });
+    }
+
+    if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
+        if(room.currentDiceValue === 6) {
+            room.currentPlayer.positions.splice(figureIndex, 1);
+            room.currentPlayer.positions.push(getStartPosition(currentPlayerColor));
+        } else {
+            return callback({ error: "Can not move this figure." });
+        }
+    } else if (getHomePositions(currentPlayerColor).includes(playerPosition)) {
+        // move in hom if possible
+    } else {
+        // move by path if possible
+    }
+
+    callback();
+    sendGameState(io, room);
 }
 
 // const nextPlayerCountDown = (io, roomId) => {
@@ -228,4 +265,4 @@ const showResultAndGivePoints = (io, roomId, user) => {
     // setTimeout(()=>nextPlayerCountDown(io, roomId), 4000);
 }
 
-module.exports = {handleGame, showResultAndGivePoints, rollDice};
+module.exports = {handleGame, showResultAndGivePoints, rollDice, handleMove};

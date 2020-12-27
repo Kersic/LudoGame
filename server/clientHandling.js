@@ -1,5 +1,6 @@
 const {getDataFromToken} = require("./helperFunctions");
 const userModel = require('./Models/user');
+const {handleMove} = require("./gameHandling");
 const {rollDice} = require("./gameHandling");
 const {addUserInRoom, removeUserFromRoom, setUserInactive, startGame, isUserInRoom, isUserDrawing, removeInactivePlayersFromRoom} = require('./rooms');
 const {handleGame, showResultAndGivePoints} = require('./gameHandling');
@@ -16,7 +17,13 @@ const handleConnection = (socket, io) => {
                     callback();
                     if(gameStarted) {
                         socket.emit('message', { user: null, text: `Welcome ${user.username}! Roll a dice! The player with highest number will start.`});
-                        socket.emit('gameState', {users: userRoom.users, currentPlayer: userRoom.currentPlayer, canRollDice: userRoom.canCurrentPlayerRollDice, diceValue: userRoom.currentDiceValue});
+                        socket.emit('gameState', {
+                            users: userRoom.users,
+                            currentPlayer: userRoom.currentPlayer,
+                            canRollDice: userRoom.canCurrentPlayerRollDice,
+                            diceValue: userRoom.currentDiceValue,
+                            canMoveFigure: userRoom.canCurrentPlayerMoveFigure,
+                        });
                     }
 
                     if(userRoom.users.filter(i=>i.active).length >= 4){
@@ -84,6 +91,14 @@ const handleConnection = (socket, io) => {
     socket.on('rollDice', ({roomId, token}, callback) => {
         getDataFromToken(token, (tokenData) => {
             rollDice(roomId, tokenData.user, callback, io, socket);
+        }, (err) => {
+            return callback(err);
+        });
+    })
+
+    socket.on('movePlayer', ({roomId, token, playerPosition}, callback) => {
+        getDataFromToken(token, (tokenData) => {
+            handleMove(roomId, tokenData.user, playerPosition, callback, io, socket);
         }, (err) => {
             return callback(err);
         });

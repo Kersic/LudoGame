@@ -193,6 +193,7 @@ const Game = ({location}) => {
     const [isDiceRolling, setIsDiceRolling] = useState(false);
     const [diceValue, setDiceValue] = useState(1);
     const [diceEnabled, setDiceEnabled] = useState(true);
+    const [canMoveFigures, setCanMoveFigures] = useState(false);
 
     useEffect(() => {
         socket = io(serverURL);
@@ -205,8 +206,6 @@ const Game = ({location}) => {
                 alert(error);
             }
         });
-        console.log(socket);
-
         return () => socket.disconnect();
 
     }, []);
@@ -217,18 +216,23 @@ const Game = ({location}) => {
         });
 
         socket.on('gameState', (gameState) => {
-            console.log("gameState");
             console.log(gameState);
             setUsers(gameState.users);
             setCurrentPlayer(gameState.currentPlayer);
             setDiceValue(gameState.diceValue);
+
             if(!gameState.canRollDice) {
                 setDiceEnabled(false);
-                console.log("disable dice");
-            }
-            else if(!gameState.currentPlayer || (getUsername() === gameState.currentPlayer.username && gameState.canRollDice)) {
+            } else if(!gameState.currentPlayer || (getUsername() === gameState.currentPlayer.username && gameState.canRollDice)) {
                 setDiceEnabled(true);
-                console.log("enable dice");
+            } else {
+                setDiceEnabled(false);
+            }
+
+            if(!gameState.canMoveFigure) {
+                setCanMoveFigures(false);
+            } else if(getUsername() === gameState.currentPlayer.username && gameState.canMoveFigure) {
+                setCanMoveFigures(true);
             } else {
                 setDiceEnabled(false);
             }
@@ -283,6 +287,13 @@ const Game = ({location}) => {
         }
     }
 
+    const movePlayer = (playerPosition) => {
+        console.log("move player " + playerPosition);
+        socket.emit('movePlayer', {token: getToken(), roomId: id, playerPosition: playerPosition}, (err) => {
+            console.log(err)
+        });
+    }
+
     const handleKeyDown = (event) => {
         if (event.keyCode !== 13) return;
         sendMessage(event);
@@ -330,6 +341,8 @@ const Game = ({location}) => {
                         setIsDiceRolling={setIsDiceRolling}
                         diceValue={diceValue}
                         canRollDice={diceEnabled}
+                        canMoveFigures={canMoveFigures}
+                        movePlayer={movePlayer}
                     />
                 </div>
                 <div className={classes.sideBoxes}>

@@ -8,10 +8,11 @@ import {
     blue,
     shadowAllDirections,
     textShadow,
-    white, LuckiestGuy
+    white, LuckiestGuy, classNames
 } from "../../mixins";
 import {createUseStyles} from "react-jss";
 import Dice from "./Dice";
+import useAuth from "../../Hooks/useAuth";
 
 const useStyles = createUseStyles({
     paper: {
@@ -42,6 +43,9 @@ const useStyles = createUseStyles({
         ...center,
         fontFamily: LuckiestGuy,
         color: white,
+    },
+    movablePlayer: {
+        cursor: "pointer",
     }
 });
 
@@ -69,26 +73,19 @@ const gameGrid = [
     [4,4,0,0,4,1,1,0,0,5,5],
 ];
 
-// const playersPositions = [
-//     {
-//         name: "Tadeja",
-//         positions: [[0,0], [6,1], [1, 0], [1,1]],
-//     },
-//     {
-//         name: "Saso",
-//         positions: [[0,9], [0,10], [1, 9], [1,10]],
-//     },
-//     {
-//         name: "Maja",
-//         positions: [[9,0], [9,1], [10, 0], [10,1]],
-//     },
-//     {
-//         name: "Klemen",
-//         positions: [[9,9], [9,10], [10, 9], [10,10]],
-//     },
-// ]
+const Player = ({user, color, canMoveFigures, movePlayer}) => {
+    const {getUsername} = useAuth();
+    const classes = useStyles();
+    const shortName = user.username.slice(0,2);
+    const arePlayersFigures = user.username === getUsername();
+    if(arePlayersFigures && canMoveFigures){
+        return (<div className={classNames(classes.player, classes.movablePlayer)} onClick={movePlayer} style={{backgroundColor: color}}>{shortName}</div>)
+    } else {
+        return (<div className={classes.player} style={{backgroundColor: color}}>{shortName}</div>)
+    }
+}
 
-const LudoGame = ({playersPositions, isDiceRolling, setIsDiceRolling, diceValue, canRollDice}) => {
+const LudoGame = ({playersPositions, isDiceRolling, setIsDiceRolling, diceValue, canRollDice, canMoveFigures, movePlayer}) => {
     const classes = useStyles();
     return (
         <div className={classes.paper}>
@@ -98,16 +95,14 @@ const LudoGame = ({playersPositions, isDiceRolling, setIsDiceRolling, diceValue,
 
                     playersPositions.map((playerPositions, playerIndex) => playerPositions.positions.map(position => {
                         if(position[0] === rowIndex && position[1] === columnIndex) {
-                            const shortName = playerPositions.username.slice(0,2);
                             if(playerIndex === 0)
-                                player = <div className={classes.player} style={{backgroundColor: red}}>{shortName}</div>
+                                player = <Player user={playerPositions} color={red} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
                             else if (playerIndex === 1)
-                                player = <div className={classes.player} style={{backgroundColor: green}}>{shortName}</div>
+                                player = <Player user={playerPositions} color={green} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
                             else if (playerIndex === 2)
-                                player = <div className={classes.player} style={{backgroundColor: orange}}>{shortName}</div>
+                                player = <Player user={playerPositions} color={orange} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
                             else if (playerIndex === 3)
-                                player = <div className={classes.player} style={{backgroundColor: blue}}>{shortName}</div>
-
+                                player = <Player user={playerPositions} color={blue} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
                         }
                     }))
 

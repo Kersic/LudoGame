@@ -30,11 +30,14 @@ const verifyToken = (req, res, next) => {
     }
 }
 
-const getTimeStringFromSeconds = (seconds) => {
-    const min = Math.floor(seconds / 60).toString();
-    let sec = (seconds % 60).toString();
-    sec = sec.length > 1 ? sec : "0"+sec;
-    return `${min}:${sec}`;
+const arrayOfPointsIncludes = (array, point) => {
+    let includes = false
+    array.map( p => {
+        if(p[0] === point[0] && p[1] === point[1]){
+            includes = true;
+        }
+    })
+    return includes;
 }
 
-module.exports = {verifyToken, getDataFromToken, getTimeStringFromSeconds}
+module.exports = {verifyToken, getDataFromToken, arrayOfPointsIncludes}
