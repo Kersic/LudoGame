@@ -174,6 +174,31 @@ const CanMovePlayer = (player, diceValue) => {
     return canMovePlayer;
 }
 
+const KickPlayerFromField = (room, position) => {
+    let playerRemoveIndex = -1;
+    let positionRemoveIndex = -1;
+    room.users.map((user, userIndex) => {
+        user.positions.map((figurePosition , positionIndex) => {
+            if(figurePosition[0] === position[0] && figurePosition[1] === position[1]) {
+                playerRemoveIndex = userIndex;
+                positionRemoveIndex = positionIndex;
+                console.log("kick figure form field");
+            }
+        })
+    })
+
+    if(playerRemoveIndex > -1 && positionRemoveIndex > -1){
+        let initialPosition = null;
+        getInitialsPositions(room.users[playerRemoveIndex].color).map(p => {
+            if(!arrayOfPointsIncludes(room.users[playerRemoveIndex].positions, p)){
+                initialPosition = p;
+            }
+        })
+        room.users[playerRemoveIndex].positions.splice(positionRemoveIndex, 1);
+        room.users[playerRemoveIndex].positions.push(initialPosition);
+    }
+}
+
 module.exports =  {
     PlayerColor,
     getInitialsPositions,
@@ -186,4 +211,5 @@ module.exports =  {
     getPathToNewPosition,
     getNewFigurePosition,
     CanMovePlayer,
+    KickPlayerFromField
 }
