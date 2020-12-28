@@ -137,13 +137,24 @@ const getNextPlayer = (room) => {
     if(currentIndex === room.users.length){
         currentIndex = 0;
     }
-    while (!room.users[currentIndex].active) {
+    //skip inactive players and players that already won
+    while (!room.users[currentIndex].active || HasFinished(room.users[currentIndex])) {
         currentIndex++;
         if(currentIndex === room.users.length){
             currentIndex = 0;
         }
     }
     return room.users[currentIndex];
+}
+
+const HasFinished = (player) => {
+    let hasWon = true;
+    player.positions.map(position => {
+        if(!arrayOfPointsIncludes(getHomePositions(player.color), position)){
+            hasWon = false;
+        }
+    })
+    return hasWon;
 }
 
 const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
@@ -216,5 +227,6 @@ module.exports =  {
     getNewFigurePosition,
     CanMovePlayer,
     KickPlayerFromField,
-    PlayerHasFigureOnField
+    PlayerHasFigureOnField,
+    HasFinished
 }

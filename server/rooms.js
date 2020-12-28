@@ -97,7 +97,7 @@ const removeUserFromRoom = (userId, roomId) => {
     }
 }
 
-const setUserInactive = (socketId) => {
+const setUserInactive = (socketId, io) => {
     let userFound = false;
 
     rooms.map((room)=> {

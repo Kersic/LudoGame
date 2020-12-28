@@ -1,5 +1,7 @@
 const {getDataFromToken} = require("./helperFunctions");
 const userModel = require('./Models/user');
+const {setNextPlayer} = require("./gameHandling");
+const {rooms} = require("./rooms");
 const {handleMove} = require("./gameHandling");
 const {rollDice} = require("./gameHandling");
 const {addUserInRoom, removeUserFromRoom, setUserInactive, startGame, isUserInRoom, isUserDrawing, removeInactivePlayersFromRoom} = require('./rooms');
@@ -106,7 +108,16 @@ const handleConnection = (socket, io) => {
 
     socket.on('disconnect', () => {
         console.log("user has left");
-        setUserInactive(socket.id);
+        setUserInactive(socket.id, io);
+        rooms.map((room) => {
+            const userIndex = room.users.findIndex((u) => u.socketId.toString() === socket.id.toString());
+            if (userIndex > -1) {
+                if(room.currentPlayer && room.users[userIndex].username === room.currentPlayer.username) {
+                    room.currentPlayerRollsLeft = 0;
+                    setNextPlayer(io, room);
+                }
+            }
+        })
     })
 }
 

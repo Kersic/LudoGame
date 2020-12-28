@@ -1,3 +1,4 @@
+const {HasFinished} = require("./ludoBoard");
 const {PlayerHasFigureOnField} = require("./ludoBoard");
 const {KickPlayerFromField} = require("./ludoBoard");
 const {getNewFigurePosition} = require("./ludoBoard");
@@ -154,6 +155,18 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
 }
 
 const setNextPlayer = (io, room) => {
+    //check if player finished game
+    if(HasFinished(room.currentPlayer)){
+        let place = 0;
+        room.users.map(user => {
+            if(HasFinished(user)) place++;
+        })
+        if(place === 1)
+            io.to(room.id).emit('gameMessage', room.currentPlayer.username + " won!");
+        else if (place > 1)
+            io.to(room.id).emit('gameMessage', room.currentPlayer.username + " got " + place + ". place!");
+    }
+
     if (room.currentPlayerRollsLeft <= 0) {
         console.log("set next player dice roll");
         room.currentPlayer = getNextPlayer(room);
@@ -192,4 +205,4 @@ const showResultAndGivePoints = (io, roomId, user) => {
     // setTimeout(()=>nextPlayerCountDown(io, roomId), 4000);
 }
 
-module.exports = {handleGame, showResultAndGivePoints, rollDice, handleMove};
+module.exports = {handleGame, showResultAndGivePoints, rollDice, handleMove, setNextPlayer};
