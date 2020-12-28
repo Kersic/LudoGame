@@ -110,11 +110,13 @@ const handleConnection = (socket, io) => {
         console.log("user has left");
         setUserInactive(socket.id, io);
         rooms.map((room) => {
-            const userIndex = room.users.findIndex((u) => u.socketId.toString() === socket.id.toString());
-            if (userIndex > -1) {
-                if(room.currentPlayer && room.users[userIndex].username === room.currentPlayer.username) {
-                    room.currentPlayerRollsLeft = 0;
-                    setNextPlayer(io, room);
+            if(room.hasStarted) {
+                const userIndex = room.users.findIndex((u) => u.socketId.toString() === socket.id.toString());
+                if (userIndex > -1) {
+                    if (room.currentPlayer && room.users[userIndex].username === room.currentPlayer.username) {
+                        room.currentPlayerRollsLeft = 0;
+                        setNextPlayer(io, room);
+                    }
                 }
             }
         })

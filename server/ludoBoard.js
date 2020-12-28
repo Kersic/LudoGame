@@ -38,7 +38,7 @@ const getStopPosition = (playerColor) => {
         case PlayerColor.RED:
             return [5, 0];
         case PlayerColor.GREEN:
-            return [0, 6];
+            return [0, 5];
         case PlayerColor.YELLOW:
             return [5, 10];
         case PlayerColor.BLUE:

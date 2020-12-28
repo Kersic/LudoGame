@@ -279,11 +279,12 @@ const Game = ({location}) => {
         socket.on('gameFinished', () => {
             console.log("game finished");
             setGameFinished(true);
+            setDiceEnabled(false);
             setTimeout(function(){
                 setGameMessage("Game has finished");
             }, 2000);
         });
-        // });
+
     }, []);
 
     useEffect(() => {

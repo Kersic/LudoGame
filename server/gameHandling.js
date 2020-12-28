@@ -11,6 +11,7 @@ const {getNumberOfRolls} = require("./ludoBoard");
 const {hasFiguresOnField} = require("./ludoBoard");
 const {isUserInRoom} = require("./rooms");
 const userModel = require('./Models/user');
+const {getStopPosition} = require("./ludoBoard");
 
 const {getInitialsPositions, PlayerColor} = require('./ludoBoard');
 
@@ -39,7 +40,7 @@ const handleGame = (socket, io, roomId) => {
             //player.positions = getInitialsPositions(player.color);
             player.positions = getHomePositions(player.color);
             player.positions.splice(1, 1);
-            player.positions.push(getInitialsPositions(player.color)[0]);
+            player.positions.push(getStopPosition(player.color));
         })
         room.canCurrentPlayerRollDice = true;
         sendGameState(io, room);
@@ -60,7 +61,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     const { error, room } = isUserInRoom(roomId, tokenUser);
     if(error) return callback(error);
 
-    const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
+    const newValue = 2;//Math.floor(Math.random() * Math.floor(6) + 1);
     console.log(tokenUser.username + " rolled " + newValue);
 
     let firstDiceValuesNum = 0
@@ -192,10 +193,11 @@ const setNextPlayer = (io, room) => {
                             fourthPlaces: (user.fourthPlaces ? user.fourthPlaces : 0) + (place === 4 ? 1 : 0),
                         }
                     }).then(() => {
-                    console.log(room.currentPlayer.username + " updated");
+                    console.log(user.username + " updated");
                 })
             });
 
+        console.log(place + " ... " + room.users.length);
         if(place === room.users.length - 1) {
             room.gameStarted = false;
             io.to(room.id).emit('gameFinished');
@@ -223,7 +225,7 @@ const setNextPlayer = (io, room) => {
                                 }
                             })
                             .then(() => {
-                                console.log(lastPlayer.username + " updated");
+                                console.log(user.username + " updated");
                                 //removeRoom(room.id);
                             })
                             .catch(err => {
@@ -233,22 +235,30 @@ const setNextPlayer = (io, room) => {
                     });
             }
         }
-
-
-
     }
 
-    if (room.currentPlayerRollsLeft <= 0) {
-        console.log("set next player dice roll");
-        room.currentPlayer = getNextPlayer(room);
-        room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
+    console.log("test test test");
+    console.log(room.gameStarted);
+
+    if(room.gameStarted === false){
+        console.log("remove room")
+        room.canCurrentPlayerRollDice = false;
+        room.canCurrentPlayerMoveFigure = false;
+        sendGameState(io, room);
+        removeRoom(room.id);
     } else {
-        console.log("set same player dice roll");
-    }
-    room.canCurrentPlayerRollDice = true;
-    room.canCurrentPlayerMoveFigure = false;
+        if (room.currentPlayerRollsLeft <= 0) {
+            console.log("set next player dice roll");
+            room.currentPlayer = getNextPlayer(room);
+            room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
+        } else {
+            console.log("set same player dice roll");
+        }
+        room.canCurrentPlayerRollDice = true;
+        room.canCurrentPlayerMoveFigure = false;
 
-    sendGameState(io, room);
+        sendGameState(io, room);
+    }
 }
 
 const showResultAndGivePoints = (io, roomId, user) => {
