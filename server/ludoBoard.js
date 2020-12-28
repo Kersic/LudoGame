@@ -150,7 +150,6 @@ const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
      if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
         if(diceVale === 6) {
             return {position:getStartPosition(currentPlayerColor), error: null}
-
         } else {
             return {position: null, error: "Can not move this figure." };
         }
@@ -164,10 +163,15 @@ const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
     }
 }
 
+const PlayerHasFigureOnField = (player, position) => {
+    return arrayOfPointsIncludes(player.positions, position);
+}
+
 const CanMovePlayer = (player, diceValue) => {
     let canMovePlayer = false;
     player.positions.map(position => {
-        if(getNewFigurePosition(diceValue, player.color, position).position !== null){
+        const newPosition = getNewFigurePosition(diceValue, player.color, position).position
+        if(newPosition !== null && !PlayerHasFigureOnField(player, newPosition)){
             canMovePlayer = true;
         }
     })
@@ -211,5 +215,6 @@ module.exports =  {
     getPathToNewPosition,
     getNewFigurePosition,
     CanMovePlayer,
-    KickPlayerFromField
+    KickPlayerFromField,
+    PlayerHasFigureOnField
 }

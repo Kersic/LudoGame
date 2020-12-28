@@ -31,6 +31,7 @@ const verifyToken = (req, res, next) => {
 }
 
 const arrayOfPointsIncludes = (array, point) => {
+    if(!array || !point) return false;
     let includes = false
     array.map( p => {
         if(p[0] === point[0] && p[1] === point[1]){
@@ -41,6 +42,7 @@ const arrayOfPointsIncludes = (array, point) => {
 }
 
 const getIndexOfPointInPath = (array, point) => {
+    if(!array || !point) return -1;
     let index = -1
     array.map((p, idx) => {
         if(p[0] === point[0] && p[1] === point[1]){

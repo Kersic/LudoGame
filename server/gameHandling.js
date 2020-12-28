@@ -1,3 +1,4 @@
+const {PlayerHasFigureOnField} = require("./ludoBoard");
 const {KickPlayerFromField} = require("./ludoBoard");
 const {getNewFigurePosition} = require("./ludoBoard");
 const {getRoom} = require('./rooms');
@@ -138,6 +139,9 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
     if(newPosition.error) {
         console.log(newPosition.error);
         return callback(error);
+    } else if(PlayerHasFigureOnField(room.currentPlayer, newPosition.position) ) {
+        console.log("Can not kick out yur own figure");
+        return callback({error: "Can not kick out yur own figure"});
     } else {
         KickPlayerFromField(room, newPosition.position);
         room.currentPlayer.positions.splice(figureIndex, 1);
