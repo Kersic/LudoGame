@@ -102,26 +102,25 @@ const setFirstPayer = (room, io) => {
 
 const handlePossibleActions = (newValue, room, io, socket) => {
     console.log("handle possible actions");
+    room.currentPlayerRollsLeft = room.currentPlayerRollsLeft - 1;
+
+    //set rolls left
     if (newValue === 6) {
-        console.log("rolled 6");
+        room.currentPlayerRollsLeft = 1;
+    } else if(hasFiguresOnField(room.currentPlayer)) {
+        room.currentPlayerRollsLeft = 0;
+    }
+
+    //set figure movement or next player
+    if (newValue === 6 || hasFiguresOnField(room.currentPlayer)) {
+        console.log("set figure moving");
         room.canCurrentPlayerRollDice = false;
         room.canCurrentPlayerMoveFigure = true;
-    } else if(hasFiguresOnField(room.currentPlayer)) {
-        console.log("has figures on filed");
+        sendGameState(io, room);
     } else {
-        room.canCurrentPlayerRollDice = true;
-        room.canCurrentPlayerMoveFigure = false;
+        setNextPlayer(io, room);
     }
 
-    room.currentPlayerRollsLeft = room.currentPlayerRollsLeft - 1;
-    console.log(room.currentPlayerRollsLeft + " rolls left");
-    if (room.currentPlayerRollsLeft <= 0 && !room.canCurrentPlayerMoveFigure) {
-        room.currentPlayer = getNextPlayer(room);
-        room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
-        room.canCurrentPlayerRollDice = true;
-    }
-
-    sendGameState(io, room);
 }
 
 const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => {
@@ -140,112 +139,43 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
 
     if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
         if(room.currentDiceValue === 6) {
+            console.log("move initial figure");
             room.currentPlayer.positions.splice(figureIndex, 1);
             room.currentPlayer.positions.push(getStartPosition(currentPlayerColor));
+            setNextPlayer(io, room);
         } else {
+            console.log("Can not move this figure.");
             return callback({ error: "Can not move this figure." });
         }
     } else {
         const result = getPathToNewPosition(playerPosition, room.currentDiceValue, currentPlayerColor)
         if(result.error){
+            console.log("Can not move this figure.");
             return callback({ error: "Can not move this figure." });
         } else {
-            console.log("move path");
-            console.log(result.path);
+            console.log("move figure in figure");
             room.currentPlayer.positions.splice(figureIndex, 1);
             room.currentPlayer.positions.push(result.path[result.path.length-1]);
+            setNextPlayer(io, room);
         }
     }
 
     callback();
-    sendGameState(io, room);
 }
 
-// const nextPlayerCountDown = (io, roomId) => {
-//     const {room} = getRoom(roomId);
-//
-//     const possiblePlayers = room.users.filter(u => u.active && !u.hasPlayed);
-//     if(possiblePlayers && possiblePlayers.length > 0){
-//        room.currentPlayer = possiblePlayers[Math.floor(Math.random() * possiblePlayers.length)];
-//        room.currentPlayer.hasPlayed = true;
-//     } else {
-//         //round points
-//         let winner = null;
-//         let tie = false;
-//         room.users.forEach((u) => {
-//             u.pointsThisGame = Math.round(u.pointsThisGame / 10) * 10;
-//             if((u.pointsThisGame > 0  && !winner) || (winner && winner.pointsThisGame < u.pointsThisGame)){
-//                 winner = u;
-//                 tie = false;
-//             } else if(winner && winner.pointsThisGame === u.pointsThisGame) {
-//                 tie = true;
-//             }
-//         });
-//         io.to(roomId).emit('timeCountdown', { time: "0:00", users: room.users});
-//         io.to(roomId).emit('gameFinished', winner && !tie ? winner.username : null);
-//
-//         //save points
-//         room.users.forEach((u) => {
-//             userModel.findOne({_id: u._id})
-//                 .then(user => {
-//                     if(user && winner) {
-//                         userModel.updateOne(
-//                             {_id: u._id},
-//                             {
-//                                 $set: {
-//                                     points: user.points + u.pointsThisGame,
-//                                     numberOfPlayedGames: user.numberOfPlayedGames + 1,
-//                                     numberOfWins: user.numberOfWins + winner && winner.username === user.username ? 1 : 0,
-//                                 }
-//                             })
-//                             .then(() => {
-//                                 removeRoom(roomId);
-//                             })
-//                             .catch(err => {
-//                                 console.log(err);
-//                                 removeRoom(roomId);
-//                             });
-//                     }
-//                 });
-//         });
-//         return;
-//     }
-//
-//     const allGames =  room.users.filter(u => u.active || (!u.hasPlayed && u.hasPlayed));
-//     const playedGames =  room.users.filter(u => u.hasPlayed);
-//     if(allGames && playedGames)
-//         room.gamesPlayed = playedGames.length + "/" + allGames.length;
-//
-//     room.currentWord = words[Math.floor(Math.random() * words.length)];
-//     io.to(room.currentPlayer.socketId).emit('currentWord', room.currentWord);
-//     let counter = 4;
-//     let countDown = setInterval(() => {
-//         counter--;
-//         io.to(roomId).emit('nextPlayerCountdown', { currentPlayer: room.currentPlayer.username, time: counter, gamesPlayed: room.gamesPlayed});
-//         if(counter === 0){
-//             clearInterval(countDown);
-//             remainingTimeCountDown(io, roomId);
-//         }
-//     }, 1000);
-//
-//     //console.log("test message send");
-//     //io.to(roomId).emit('message', { user: null, text: `Test message`});
-// }
-//
-// const remainingTimeCountDown = (io, roomId) => {
-//     const {room} = getRoom(roomId);
-//
-//     room.counter = playerTime;
-//     room.countDown = setInterval(() => {
-//         room.counter--;
-//         io.to(roomId).emit('timeCountdown', { time: getTimeStringFromSeconds(room.counter), users: room.users});
-//         if(room.counter <= 0){
-//             room.currentPlayer = null;
-//             clearInterval(room.countDown);
-//             showResultAndGivePoints(io, roomId, null);
-//         }
-//     }, 1000);
-// }
+const setNextPlayer = (io, room) => {
+    if (room.currentPlayerRollsLeft <= 0) {
+        console.log("set next player dice roll");
+        room.currentPlayer = getNextPlayer(room);
+        room.currentPlayerRollsLeft = getNumberOfRolls(room.currentPlayer);
+    } else {
+        console.log("set same player dice roll");
+    }
+    room.canCurrentPlayerRollDice = true;
+    room.canCurrentPlayerMoveFigure = false;
+
+    sendGameState(io, room);
+}
 
 const showResultAndGivePoints = (io, roomId, user) => {
     // const {room} = getRoom(roomId);

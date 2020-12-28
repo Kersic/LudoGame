@@ -272,9 +272,9 @@ const Game = ({location}) => {
         if(isDiceRolling && diceEnabled) {
             console.log("roll dice");
             socket.emit('rollDice', {token: getToken(), roomId: id}, (value) => {
+                setDiceValue(value);
                 setTimeout(function(){
                     setIsDiceRolling(false);
-                    setDiceValue(value);
                 }, 1000);
             });
         }
