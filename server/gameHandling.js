@@ -60,7 +60,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     room.users.map(user => {
             if(user.firstDiceValue === 0 && user.username === tokenUser.username){
                 user.firstDiceValue = newValue;
-                io.to(roomId).emit('message', { user: null, text: user.username + " rolled " + newValue });
+                //io.to(roomId).emit('message', { user: null, text: user.username + " rolled " + newValue });
             }
             if(user.firstDiceValue !== 0 && user.active){
                 firstDiceValuesNum++;
@@ -76,6 +76,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     } else if (room.firstPlayerSelected) {
         room.currentDiceValue = newValue;
         socket.to(room.id).emit('currentPlayerRolledDice', {value: newValue});
+        io.to(room.id).emit('gameMessage', "");
         handlePossibleActions(newValue, room, io, socket)
     }
     return callback(newValue);
@@ -94,7 +95,7 @@ const setFirstPayer = (room, io) => {
     console.log(room.currentPlayer.username + " has " + room.currentPlayerRollsLeft + " rolls left");
     room.canCurrentPlayerRollDice = true;
     sendGameState(io, room);
-    io.to(room.id).emit('message', { user: null, text: "First player is " + firstUser.username });
+    io.to(room.id).emit('gameMessage', "First player is " + firstUser.username);
 }
 
 const handlePossibleActions = (newValue, room, io, socket) => {
@@ -138,7 +139,7 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
 
     if(newPosition.error) {
         console.log(newPosition.error);
-        return callback(error);
+        return callback({error: newPosition.error});
     } else if(PlayerHasFigureOnField(room.currentPlayer, newPosition.position) ) {
         console.log("Can not kick out yur own figure");
         return callback({error: "Can not kick out yur own figure"});
@@ -149,7 +150,7 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
         setNextPlayer(io, room);
     }
 
-    callback();
+    callback({error: ""});
 }
 
 const setNextPlayer = (io, room) => {

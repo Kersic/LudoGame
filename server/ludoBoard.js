@@ -14,9 +14,9 @@ const getInitialsPositions = (playerColor) => {
         case PlayerColor.GREEN:
             return [[0,9], [0,10], [1, 9], [1,10]];
         case PlayerColor.YELLOW:
-            return [[9,0], [9,1], [10, 0], [10,1]];
-        case PlayerColor.BLUE:
             return [[9,9], [9,10], [10, 9], [10,10]];
+        case PlayerColor.BLUE:
+            return [[9,0], [9,1], [10, 0], [10,1]];
     }
 }
 
@@ -27,9 +27,9 @@ const getStartPosition = (playerColor) => {
         case PlayerColor.GREEN:
             return [0, 6];
         case PlayerColor.YELLOW:
-            return [10, 4];
-        case PlayerColor.BLUE:
             return [6, 10];
+        case PlayerColor.BLUE:
+            return [10, 4];
     }
 }
 
@@ -40,9 +40,9 @@ const getStopPosition = (playerColor) => {
         case PlayerColor.GREEN:
             return [0, 6];
         case PlayerColor.YELLOW:
-            return [10, 5];
-        case PlayerColor.BLUE:
             return [5, 10];
+        case PlayerColor.BLUE:
+            return [10, 5];
     }
 }
 
@@ -53,9 +53,9 @@ const getHomePositions = (playerColor) => {
         case PlayerColor.GREEN:
             return [[1, 5], [2, 5], [3, 5], [4, 5]];
         case PlayerColor.YELLOW:
-            return [[9, 5], [8, 5], [7, 5], [6, 5]];
-        case PlayerColor.BLUE:
             return [[5, 9], [5, 8], [5, 7], [5, 6]];
+        case PlayerColor.BLUE:
+            return [[9, 5], [8, 5], [7, 5], [6, 5]];
     }
 }
 

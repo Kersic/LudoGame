@@ -28,12 +28,12 @@ const useStyles = createUseStyles({
         backgroundColor: lightOrange,
         minHeight: "100vh",
         display: "grid",
-        ...aboveBreakpoint(breakpoint4, {
-            gridTemplateColumns: "7fr 3fr",
-        }),
-        ...aboveBreakpoint(breakpoint2, {
-            gridTemplateColumns: "8fr 2fr",
-        }),
+        // ...aboveBreakpoint(breakpoint4, {
+        //     gridTemplateColumns: "7fr 3fr",
+        // }),
+        // ...aboveBreakpoint(breakpoint2, {
+        //     gridTemplateColumns: "8fr 2fr",
+        // }),
     },
     paper: {
         marginLeft: "40px",
@@ -70,12 +70,12 @@ const useStyles = createUseStyles({
         paddingLeft: "60px",
     },
     bottomRight:{
-        backgroundColor: blue,
+        backgroundColor: orange,
         borderTopLeftRadius: cornerRadius,
         paddingLeft: "60px",
     },
     bottomLeft:{
-        backgroundColor: orange,
+        backgroundColor: blue,
         borderTopRightRadius: cornerRadius,
         paddingLeft: "60px",
     },
@@ -170,6 +170,13 @@ const useStyles = createUseStyles({
     },
     inactive: {
         opacity: "0.4"
+    },
+    gameMessage: {
+        marginTop: "30px",
+        color: blue,
+        maxWidth: "500px",
+        textTransform: "uppercase",
+        textAlign: "center",
     }
 });
 
@@ -182,7 +189,6 @@ const Game = ({location}) => {
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState([]);
     const [currentPlayer, setCurrentPlayer] = useState(null);
-    const [alertMessage, setAlertMessage] = useState("");
     const [gameFinished, setGameFinished] = useState(false);
     const [users, setUsers] = useState([]);
     const { id } = queryString.parse(location.search);
@@ -194,6 +200,7 @@ const Game = ({location}) => {
     const [diceValue, setDiceValue] = useState(1);
     const [diceEnabled, setDiceEnabled] = useState(true);
     const [canMoveFigures, setCanMoveFigures] = useState(false);
+    const [gameMessage, setGameMessage] = useState("Roll a dice! Player with highest number starts");
 
     useEffect(() => {
         socket = io(serverURL);
@@ -246,19 +253,15 @@ const Game = ({location}) => {
             }, 1000);
         });
 
-        socket.on('gameFinished', (winner) => {
-            setGameFinished(true);
-            if(winner)
-                setAlertMessage( "Winner is " + winner);
-            else
-                setAlertMessage( "Game ended in a tie");
+        socket.on('gameMessage', (message) => {
+            setGameMessage( message);
 
         });
-        socket.on('result', (data) => {
-            if(data.winner){
-                setAlertMessage(data.winner + " won!");
-            }
-        });
+        // socket.on('result', (data) => {
+        //     if(data.winner){
+        //         setAlertMessage(data.winner + " won!");
+        //     }
+        // });
     }, []);
 
     useEffect(() => {
@@ -290,7 +293,8 @@ const Game = ({location}) => {
     const movePlayer = (playerPosition) => {
         console.log("move player " + playerPosition);
         socket.emit('movePlayer', {token: getToken(), roomId: id, playerPosition: playerPosition}, (err) => {
-            console.log(err)
+            console.log(err);
+            if(err) setGameMessage(err.error);
         });
     }
 
@@ -323,6 +327,7 @@ const Game = ({location}) => {
                     >
                         {redUser.username}
                     </div>}
+                    <div className={classes.gameMessage}>{gameMessage}</div>
                     {greenUser &&
                     <div className={classNames(
                                 classes.topRight,
@@ -346,19 +351,9 @@ const Game = ({location}) => {
                     />
                 </div>
                 <div className={classes.sideBoxes}>
-                    {yellowUser &&
-                    <div className={classNames(
-                            classes.bottomLeft,
-                            classes.nameBox,
-                            isCurrentPlayer(yellowUser) ? classes.currentPlayer : "",
-                            isActive(yellowUser) ? "" : classes.inactive,
-                        )}
-                    >
-                        {yellowUser.username}
-                    </div>}
                     {blueUser &&
                     <div className={classNames(
-                            classes.bottomRight,
+                            classes.bottomLeft,
                             classes.nameBox,
                             isCurrentPlayer(blueUser) ? classes.currentPlayer : "",
                             isActive(blueUser) ? "" : classes.inactive,
@@ -366,39 +361,50 @@ const Game = ({location}) => {
                     >
                         {blueUser.username}
                     </div>}
+                    {!blueUser && <div/>}
+                    {yellowUser &&
+                    <div className={classNames(
+                            classes.bottomRight,
+                            classes.nameBox,
+                            isCurrentPlayer(yellowUser) ? classes.currentPlayer : "",
+                            isActive(yellowUser) ? "" : classes.inactive,
+                        )}
+                    >
+                        {yellowUser.username}
+                    </div>}
                 </div>
             </div>
 
-            <div className={classes.rightColumn}>
-                <div className={classes.chatWrapper}>
-                   <Chat messages={messages} />
-                </div>
-                <div className={classes.chatInputWrapper}>
-                    <RoundedInput value={message} setValue={setMessage} placeholder={"Say hello..."} disabled={gameFinished}/>
-                    <div className={classes.sendButton} onClick={sendMessage}>
-                        ᗌ
-                    </div>
-                </div>
-                <div className={classes.scoreWrapper}>
-                    {/*<div className={classes.resultList}>*/}
-                        {/*<div className={classNames(classes.resultListData, classes.resultListHeader)}>*/}
-                        {/*    <div>NAME</div>*/}
-                        {/*    <div>POINTS</div>*/}
-                        {/*</div>*/}
-                        {/*{users.map(user =>*/}
-                        {/*    <div key={user.username} className={classes.resultListData}>*/}
-                        {/*        <div style={{opacity: user.active ? "1" : "0.3",*/}
-                        {/*            fontWeight: user.username === currentPlayer ? "bold" : "",*/}
-                        {/*        }}*/}
-                        {/*        >*/}
-                        {/*            {user.username}*/}
-                        {/*        </div>*/}
-                        {/*        <div style={{opacity: user.active ? "1" : "0.5"}}>{user.pointsThisGame}</div>*/}
-                        {/*    </div>*/}
-                        {/*)}*/}
-                    {/*</div>*/}
-                </div>
-            </div>
+            {/*<div className={classes.rightColumn}>*/}
+            {/*    <div className={classes.chatWrapper}>*/}
+            {/*       <Chat messages={messages} />*/}
+            {/*    </div>*/}
+            {/*    <div className={classes.chatInputWrapper}>*/}
+            {/*        <RoundedInput value={message} setValue={setMessage} placeholder={"Say hello..."} disabled={gameFinished}/>*/}
+            {/*        <div className={classes.sendButton} onClick={sendMessage}>*/}
+            {/*            ᗌ*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*    <div className={classes.scoreWrapper}>*/}
+            {/*        /!*<div className={classes.resultList}>*!/*/}
+            {/*            /!*<div className={classNames(classes.resultListData, classes.resultListHeader)}>*!/*/}
+            {/*            /!*    <div>NAME</div>*!/*/}
+            {/*            /!*    <div>POINTS</div>*!/*/}
+            {/*            /!*</div>*!/*/}
+            {/*            /!*{users.map(user =>*!/*/}
+            {/*            /!*    <div key={user.username} className={classes.resultListData}>*!/*/}
+            {/*            /!*        <div style={{opacity: user.active ? "1" : "0.3",*!/*/}
+            {/*            /!*            fontWeight: user.username === currentPlayer ? "bold" : "",*!/*/}
+            {/*            /!*        }}*!/*/}
+            {/*            /!*        >*!/*/}
+            {/*            /!*            {user.username}*!/*/}
+            {/*            /!*        </div>*!/*/}
+            {/*            /!*        <div style={{opacity: user.active ? "1" : "0.5"}}>{user.pointsThisGame}</div>*!/*/}
+            {/*            /!*    </div>*!/*/}
+            {/*            /!*)}*!/*/}
+            {/*        /!*</div>*!/*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </div>
     )
 }

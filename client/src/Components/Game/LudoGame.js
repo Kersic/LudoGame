@@ -53,8 +53,8 @@ const FiledType = {
     NOT_FIELD: 0,
     RED: 2,
     GREEN: 3,
-    YELLOW: 4,
-    BLUE: 5,
+    BLUE: 4,
+    YELLOW: 5,
     EMPTY: 1,
     DICE: 6,
 }
@@ -95,13 +95,13 @@ const LudoGame = ({playersPositions, isDiceRolling, setIsDiceRolling, diceValue,
 
                     playersPositions.map((playerPositions, playerIndex) => playerPositions.positions.map(position => {
                         if(position[0] === rowIndex && position[1] === columnIndex) {
-                            if(playerIndex === 0)
+                            if(playerPositions.color === "red")
                                 player = <Player user={playerPositions} color={red} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
-                            else if (playerIndex === 1)
+                            else if (playerPositions.color === "green")
                                 player = <Player user={playerPositions} color={green} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
-                            else if (playerIndex === 2)
+                            else if (playerPositions.color === "yellow")
                                 player = <Player user={playerPositions} color={orange} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
-                            else if (playerIndex === 3)
+                            else if (playerPositions.color === "blue")
                                 player = <Player user={playerPositions} color={blue} canMoveFigures={canMoveFigures} movePlayer={()=>movePlayer(position)}/>
                         }
                     }))
