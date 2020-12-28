@@ -189,7 +189,7 @@ const CanMovePlayer = (player, diceValue) => {
     return canMovePlayer;
 }
 
-const KickPlayerFromField = (room, position) => {
+const KickPlayerFromField = (io, room, position) => {
     let playerRemoveIndex = -1;
     let positionRemoveIndex = -1;
     room.users.map((user, userIndex) => {
@@ -211,7 +211,9 @@ const KickPlayerFromField = (room, position) => {
         })
         room.users[playerRemoveIndex].positions.splice(positionRemoveIndex, 1);
         room.users[playerRemoveIndex].positions.push(initialPosition);
+        io.to(room.id).emit('kickAnimation', initialPosition);
     }
+
 }
 
 module.exports =  {

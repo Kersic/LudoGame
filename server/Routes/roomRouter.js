@@ -41,7 +41,17 @@ router.post('/', verifyToken, (req, res) => {
                     pointsThisGame: 0,
                     hasPlayed: false,
                     active: false,
+                    socketId: null,
+                    positions: [],
+                    color: null,
+                    firstDiceValue: 0,
                 }],
+                currentPlayer: null,
+                currentPlayerRollsLeft: 0,
+                canCurrentPlayerRollDice: true,
+                canCurrentPlayerMoveFigure: false,
+                firstPlayerSelected: false,
+                currentDiceValue: 1,
                 hasStarted:false,
             }
             rooms.push(room);

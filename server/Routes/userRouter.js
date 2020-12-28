@@ -39,9 +39,11 @@ router.post('/register', async (req, res) => {
         email: req.body.email,
         username: req.body.username,
         password: req.body.password,
-        points: 0,
         numberOfPlayedGames: 0,
-        numberOfWins: 0,
+        firstPlaces: 0,
+        secondPlaces: 0,
+        thirdPlaces: 0,
+        fourthPlaces: 0,
     });
     tag.save()
         .then(user => {

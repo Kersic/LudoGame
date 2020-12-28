@@ -15,15 +15,23 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    'points': {
-        type: Number,
-        required: true,
-    },
     'numberOfPlayedGames': {
         type: Number,
         required: true,
     },
-    'numberOfWins': {
+    'firstPlaces': {
+        type: Number,
+        required: true,
+    },
+    'secondPlaces': {
+        type: Number,
+        required: true,
+    },
+    'thirdPlaces': {
+        type: Number,
+        required: true,
+    },
+    'fourthPlaces': {
         type: Number,
         required: true,
     },

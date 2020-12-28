@@ -145,7 +145,7 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
         console.log("Can not kick out yur own figure");
         return callback({error: "Can not kick out yur own figure"});
     } else {
-        KickPlayerFromField(room, newPosition.position);
+        KickPlayerFromField(io, room, newPosition.position);
         room.currentPlayer.positions.splice(figureIndex, 1);
         room.currentPlayer.positions.push(newPosition.position);
         setNextPlayer(io, room);
