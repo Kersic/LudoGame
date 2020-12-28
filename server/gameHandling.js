@@ -1,3 +1,5 @@
+const {removeRoom} = require("./rooms");
+const {getHomePositions} = require("./ludoBoard");
 const {HasFinished} = require("./ludoBoard");
 const {PlayerHasFigureOnField} = require("./ludoBoard");
 const {KickPlayerFromField} = require("./ludoBoard");
@@ -8,6 +10,7 @@ const {getNextPlayer} = require("./ludoBoard");
 const {getNumberOfRolls} = require("./ludoBoard");
 const {hasFiguresOnField} = require("./ludoBoard");
 const {isUserInRoom} = require("./rooms");
+const userModel = require('./Models/user');
 
 const {getInitialsPositions, PlayerColor} = require('./ludoBoard');
 
@@ -33,7 +36,10 @@ const handleGame = (socket, io, roomId) => {
                     break;
 
             }
-            player.positions = getInitialsPositions(player.color);
+            //player.positions = getInitialsPositions(player.color);
+            player.positions = getHomePositions(player.color);
+            player.positions.splice(1, 1);
+            player.positions.push(getInitialsPositions(player.color)[0]);
         })
         room.canCurrentPlayerRollDice = true;
         sendGameState(io, room);
@@ -151,7 +157,7 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
         setNextPlayer(io, room);
     }
 
-    callback({error: ""});
+    callback();
 }
 
 const setNextPlayer = (io, room) => {
@@ -161,10 +167,77 @@ const setNextPlayer = (io, room) => {
         room.users.map(user => {
             if(HasFinished(user)) place++;
         })
-        if(place === 1)
+
+
+
+        if(place === 1) {
             io.to(room.id).emit('gameMessage', room.currentPlayer.username + " won!");
-        else if (place > 1)
-            io.to(room.id).emit('gameMessage', room.currentPlayer.username + " got " + place + ". place!");
+        }
+        else if (place > 1) {
+            io.to(room.id).emit('gameMessage', room.currentPlayer.username + " took the " + place + ". place!");
+        }
+
+        io.to(room.id).emit('wonAnimation');
+
+        console.log("updating");
+        //save score
+        userModel.findOne({_id: room.currentPlayer._id})
+            .then(user => {
+                userModel.updateOne(
+                    {_id: room.currentPlayer._id},
+                    {
+                        $set: {
+                            numberOfPlayedGames: user.numberOfPlayedGames + 1,
+                            firstPlaces: (user.firstPlaces ? user.firstPlaces : 0) + (place === 1 ? 1 : 0),
+                            secondPlaces: (user.secondPlaces ? user.secondPlaces : 0) + (place === 2 ? 1 : 0),
+                            thirdPlaces: (user.thirdPlaces ? user.thirdPlaces : 0) + (place === 3 ? 1 : 0),
+                            fourthPlaces: (user.fourthPlaces ? user.fourthPlaces : 0) + (place === 4 ? 1 : 0),
+                        }
+                    }).then(() => {
+                    console.log(room.currentPlayer.username + " updated");
+                })
+            });
+
+        if(place === room.users.length - 1) {
+            room.gameStarted = false;
+            io.to(room.id).emit('gameFinished');
+            console.log("game finished");
+
+            let lastPlayer = null;
+            room.users.map(user => {
+                if(!HasFinished(user)) lastPlayer = user;
+            })
+
+            if(lastPlayer) {
+                console.log("updating last player :" + lastPlayer.username);
+                //save last player score
+                userModel.findOne({_id: lastPlayer._id})
+                    .then(user => {
+                        userModel.updateOne(
+                            {_id: lastPlayer._id},
+                            {
+                                $set: {
+                                    numberOfPlayedGames: user.numberOfPlayedGames + 1,
+                                    firstPlaces: (user.firstPlaces ? user.firstPlaces : 0) + (place === 1 ? 1 : 0),
+                                    secondPlaces: (user.secondPlaces ? user.secondPlaces : 0) + (place === 2 ? 1 : 0),
+                                    thirdPlaces: (user.thirdPlaces ? user.thirdPlaces : 0) + (place === 3 ? 1 : 0),
+                                    fourthPlaces: (user.fourthPlaces ? user.fourthPlaces : 0) + (place === 4 ? 1 : 0),
+                                }
+                            })
+                            .then(() => {
+                                console.log(lastPlayer.username + " updated");
+                                //removeRoom(room.id);
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                //removeRoom(room.id);
+                            });
+                    });
+            }
+        }
+
+
+
     }
 
     if (room.currentPlayerRollsLeft <= 0) {
