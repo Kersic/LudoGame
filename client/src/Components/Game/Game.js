@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {createUseStyles} from "react-jss";
 import queryString from 'query-string';
 import io from "socket.io-client";
+import useSound from 'use-sound';
 
 import {
     aboveBreakpoint, belowBreakpoint, blue,
@@ -19,6 +20,9 @@ import useAuth from "../../Hooks/useAuth";
 import {useHistory} from "react-router-dom";
 import LudoGame from "./LudoGame";
 import {PlayerColor} from "../../enums";
+import diceSound from '../../Sounds/dice.mp3';
+import kickSound from '../../Sounds/kick.mp3';
+import wonSound from '../../Sounds/won2.mp3';
 
 const chatWrapperSize = 50;
 const infoBoxSizes = 70;
@@ -202,6 +206,11 @@ const Game = ({location}) => {
     const [canMoveFigures, setCanMoveFigures] = useState(false);
     const [gameMessage, setGameMessage] = useState("Roll a dice! Player with highest number starts");
 
+    //sounds
+    const [PlayDiceSound] = useSound(diceSound, { volume: 0.5 });
+    const [PlayKickSound] = useSound(kickSound, { volume: 0.5 });
+    const [PlayWonSound] = useSound(wonSound, { volume: 0.5 });
+
     useEffect(() => {
         socket = io(serverURL);
         socket.emit('join', { roomId:id, token:getToken() }, (error) => {
@@ -257,10 +266,23 @@ const Game = ({location}) => {
             setGameMessage( message);
 
         });
-        // socket.on('result', (data) => {
-        //     if(data.winner){
-        //         setAlertMessage(data.winner + " won!");
-        //     }
+        socket.on('kickAnimation', () => {
+            console.log("kick animation");
+            PlayKickSound();
+        });
+
+        socket.on('wonAnimation', () => {
+            console.log("won animation")
+            PlayWonSound();
+        });
+
+        socket.on('gameFinished', () => {
+            console.log("game finished");
+            setGameFinished(true);
+            setTimeout(function(){
+                setGameMessage("Game has finished");
+            }, 2000);
+        });
         // });
     }, []);
 
@@ -274,6 +296,7 @@ const Game = ({location}) => {
     useEffect(() => {
         if(isDiceRolling && diceEnabled) {
             console.log("roll dice");
+            PlayDiceSound();
             socket.emit('rollDice', {token: getToken(), roomId: id}, (value) => {
                 setDiceValue(value);
                 setTimeout(function(){

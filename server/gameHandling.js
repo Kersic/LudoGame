@@ -168,8 +168,6 @@ const setNextPlayer = (io, room) => {
             if(HasFinished(user)) place++;
         })
 
-
-
         if(place === 1) {
             io.to(room.id).emit('gameMessage', room.currentPlayer.username + " won!");
         }
@@ -179,12 +177,12 @@ const setNextPlayer = (io, room) => {
 
         io.to(room.id).emit('wonAnimation');
 
-        console.log("updating");
+        console.log("updating current player " + room.currentPlayer.username);
         //save score
         userModel.findOne({_id: room.currentPlayer._id})
             .then(user => {
                 userModel.updateOne(
-                    {_id: room.currentPlayer._id},
+                    {_id: user._id},
                     {
                         $set: {
                             numberOfPlayedGames: user.numberOfPlayedGames + 1,
@@ -214,7 +212,7 @@ const setNextPlayer = (io, room) => {
                 userModel.findOne({_id: lastPlayer._id})
                     .then(user => {
                         userModel.updateOne(
-                            {_id: lastPlayer._id},
+                            {_id: user._id},
                             {
                                 $set: {
                                     numberOfPlayedGames: user.numberOfPlayedGames + 1,
