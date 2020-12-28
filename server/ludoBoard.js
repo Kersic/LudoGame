@@ -1,3 +1,4 @@
+const {arrayOfPointsIncludes} = require("./helperFunctions");
 const {getIndexOfPointInPath} = require("./helperFunctions");
 const PlayerColor = {
     RED: 'red',
@@ -88,8 +89,6 @@ const PlayerPath = (playerColor) => {
 const getPathToNewPosition = (startPosition, numOfMoves, playerColor) => {
     let movePath = [];
     let playerPath = PlayerPath(playerColor);
-    console.log(playerPath);
-
     const startIndex = getIndexOfPointInPath(playerPath, startPosition);
 
     if(startIndex+numOfMoves >= playerPath.length)
@@ -103,19 +102,21 @@ const getPathToNewPosition = (startPosition, numOfMoves, playerColor) => {
 }
 
 const hasFiguresOnField = (player) => {
+    const playerFields = colorSpecificFields(player.color);
+    let figuresOnField = false;
     player.positions.map(position => {
-        if(!colorSpecificFields(player.color).includes(position)){
-            return true;
+        if(!arrayOfPointsIncludes(playerFields, position)){
+            figuresOnField = true;
         }
     })
-    return false;
+    return figuresOnField;
 }
 
 const canMovePlayersInHome = (player) => {
     const homePositions = getHomePositions(player.color);
     for(let i = homePositions.length - 1; i >= 0; i--){
         for(let j = i - 1; j >= 0; j--){
-            if(!player.positions.includes(homePositions[i]) && player.positions.includes(homePositions[j])){
+            if(!arrayOfPointsIncludes(player.positions, homePositions[i]) && arrayOfPointsIncludes(player.positions, homePositions[j])){
                 return true;
             }
         }
