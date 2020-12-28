@@ -1,21 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {createUseStyles} from "react-jss";
 import queryString from 'query-string';
 import io from "socket.io-client";
 import useSound from 'use-sound';
 
 import {
-    aboveBreakpoint, belowBreakpoint, blue,
-    breakpoint2,
-    breakpoint4, center, classNames,
+    blue,
+    center, classNames,
     cornerRadius, green,
     lightOrange, LuckiestGuy,
-    orange, red, shadowAllDirections, shadowButtonLeft, shadowButtonRight, shadowTopLeft, textShadow,
+    orange, red, shadowAllDirections, shadowButtonRight, shadowTopLeft, textShadow,
     white,
 } from "../../mixins";
-import RoundedInput from "../RoundedInput";
 import {serverURL} from "../../config";
-import Chat from "../Chat/Chat";
 import useAuth from "../../Hooks/useAuth";
 import {useHistory} from "react-router-dom";
 import LudoGame from "./LudoGame";
@@ -32,12 +29,6 @@ const useStyles = createUseStyles({
         backgroundColor: lightOrange,
         minHeight: "100vh",
         display: "grid",
-        // ...aboveBreakpoint(breakpoint4, {
-        //     gridTemplateColumns: "7fr 3fr",
-        // }),
-        // ...aboveBreakpoint(breakpoint2, {
-        //     gridTemplateColumns: "8fr 2fr",
-        // }),
     },
     paper: {
         marginLeft: "40px",
@@ -398,37 +389,6 @@ const Game = ({location}) => {
                     </div>}
                 </div>
             </div>
-
-            {/*<div className={classes.rightColumn}>*/}
-            {/*    <div className={classes.chatWrapper}>*/}
-            {/*       <Chat messages={messages} />*/}
-            {/*    </div>*/}
-            {/*    <div className={classes.chatInputWrapper}>*/}
-            {/*        <RoundedInput value={message} setValue={setMessage} placeholder={"Say hello..."} disabled={gameFinished}/>*/}
-            {/*        <div className={classes.sendButton} onClick={sendMessage}>*/}
-            {/*            ᗌ*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*    <div className={classes.scoreWrapper}>*/}
-            {/*        /!*<div className={classes.resultList}>*!/*/}
-            {/*            /!*<div className={classNames(classes.resultListData, classes.resultListHeader)}>*!/*/}
-            {/*            /!*    <div>NAME</div>*!/*/}
-            {/*            /!*    <div>POINTS</div>*!/*/}
-            {/*            /!*</div>*!/*/}
-            {/*            /!*{users.map(user =>*!/*/}
-            {/*            /!*    <div key={user.username} className={classes.resultListData}>*!/*/}
-            {/*            /!*        <div style={{opacity: user.active ? "1" : "0.3",*!/*/}
-            {/*            /!*            fontWeight: user.username === currentPlayer ? "bold" : "",*!/*/}
-            {/*            /!*        }}*!/*/}
-            {/*            /!*        >*!/*/}
-            {/*            /!*            {user.username}*!/*/}
-            {/*            /!*        </div>*!/*/}
-            {/*            /!*        <div style={{opacity: user.active ? "1" : "0.5"}}>{user.pointsThisGame}</div>*!/*/}
-            {/*            /!*    </div>*!/*/}
-            {/*            /!*)}*!/*/}
-            {/*        /!*</div>*!/*/}
-            {/*    </div>*/}
-            {/*</div>*/}
         </div>
     )
 }

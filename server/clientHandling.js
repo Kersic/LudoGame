@@ -4,8 +4,8 @@ const {setNextPlayer} = require("./gameHandling");
 const {rooms} = require("./rooms");
 const {handleMove} = require("./gameHandling");
 const {rollDice} = require("./gameHandling");
-const {addUserInRoom, removeUserFromRoom, setUserInactive, startGame, isUserInRoom, isUserDrawing, removeInactivePlayersFromRoom} = require('./rooms');
-const {handleGame, showResultAndGivePoints} = require('./gameHandling');
+const {addUserInRoom, removeUserFromRoom, setUserInactive, startGame, isUserInRoom, removeInactivePlayersFromRoom} = require('./rooms');
+const {handleGame} = require('./gameHandling');
 
 const handleConnection = (socket, io) => {
     socket.on('join', ({ roomId, token }, callback) => {
@@ -54,7 +54,7 @@ const handleConnection = (socket, io) => {
     socket.on('sendMessage', ({token, roomId, message}, callback) => {
         console.log("send Message");
         getDataFromToken(token, (tokenData) => {
-            const { error, room } = isUserInRoom(roomId, tokenData.user);
+            const { error } = isUserInRoom(roomId, tokenData.user);
             if(error) return callback(error);
             io.to(roomId).emit('message', { user: tokenData.user.username, text: message });
             callback();

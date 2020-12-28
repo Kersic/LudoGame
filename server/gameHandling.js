@@ -13,7 +13,7 @@ const {isUserInRoom} = require("./rooms");
 const userModel = require('./Models/user');
 const {getStopPosition} = require("./ludoBoard");
 
-const {getInitialsPositions, PlayerColor} = require('./ludoBoard');
+const {PlayerColor} = require('./ludoBoard');
 
 const handleGame = (socket, io, roomId) => {
     console.log("handle game");
@@ -106,7 +106,7 @@ const setFirstPayer = (room, io) => {
     io.to(room.id).emit('gameMessage', "First player is " + firstUser.username);
 }
 
-const handlePossibleActions = (newValue, room, io, socket) => {
+const handlePossibleActions = (newValue, room, io) => {
     console.log("handle possible actions");
     room.currentPlayerRollsLeft = room.currentPlayerRollsLeft - 1;
 
@@ -129,7 +129,7 @@ const handlePossibleActions = (newValue, room, io, socket) => {
 
 }
 
-const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => {
+const handleMove = (roomId, tokenUser, playerPosition, callback, io) => {
     console.log(playerPosition)
     const { error, room } = isUserInRoom(roomId, tokenUser);
     if(error) return callback(error);
@@ -261,29 +261,4 @@ const setNextPlayer = (io, room) => {
     }
 }
 
-const showResultAndGivePoints = (io, roomId, user) => {
-    // const {room} = getRoom(roomId);
-    // io.to(roomId).emit('roundFinished');
-    // if(user !== null){
-    //     clearInterval(room.countDown);
-    //
-    //     //give points
-    //     const points = (room.counter * 100) / playerTime;
-    //     const winner = room.users.find(u => u.username === user.username);
-    //     if(winner) winner.pointsThisGame += Math.floor(points);
-    //     const currentPlayer = room.users.find(u => u.username === room.currentPlayer.username);
-    //     if(currentPlayer) currentPlayer.pointsThisGame += Math.floor(points / 2);
-    //     io.to(roomId).emit('timeCountdown', { time: "0:00", users: room.users});
-    //
-    //
-    //     io.to(roomId).emit('result', { winner: user.username, word: room.currentWord});
-    // } else {
-    //     io.to(roomId).emit('result', { winner: null, word: room.currentWord});
-    // }
-    // room.currentPlayer = null;
-    // room.currentWord = "";
-    //
-    // setTimeout(()=>nextPlayerCountDown(io, roomId), 4000);
-}
-
-module.exports = {handleGame, showResultAndGivePoints, rollDice, handleMove, setNextPlayer};
+module.exports = {handleGame, rollDice, handleMove, setNextPlayer};
