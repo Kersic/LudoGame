@@ -146,4 +146,44 @@ const getNextPlayer = (room) => {
     return room.users[currentIndex];
 }
 
-module.exports =  {PlayerColor, getInitialsPositions, getHomePositions, getStartPosition, getStopPosition, hasFiguresOnField, getNumberOfRolls, getNextPlayer, getPathToNewPosition}
+const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
+     if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
+        if(diceVale === 6) {
+            return {position:getStartPosition(currentPlayerColor), error: null}
+
+        } else {
+            return {position: null, error: "Can not move this figure." };
+        }
+    } else {
+        const result = getPathToNewPosition(playerPosition, diceVale, currentPlayerColor)
+        if(result.error){
+            return {position: null, error: "Can not move this figure." };
+        } else {
+            return {position:result.path[result.path.length-1], error: null}
+        }
+    }
+}
+
+const CanMovePlayer = (player, diceValue) => {
+    let canMovePlayer = false;
+    player.positions.map(position => {
+        if(getNewFigurePosition(diceValue, player.color, position).position !== null){
+            canMovePlayer = true;
+        }
+    })
+    return canMovePlayer;
+}
+
+module.exports =  {
+    PlayerColor,
+    getInitialsPositions,
+    getHomePositions,
+    getStartPosition,
+    getStopPosition,
+    hasFiguresOnField,
+    getNumberOfRolls,
+    getNextPlayer,
+    getPathToNewPosition,
+    getNewFigurePosition,
+    CanMovePlayer,
+}

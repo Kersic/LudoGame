@@ -2,6 +2,8 @@ const {getRoom, removeRoom} = require('./rooms');
 const {getTimeStringFromSeconds} = require('./helperFunctions');
 const {words} = require('./words');
 const userModel = require('./Models/user');
+const {CanMovePlayer} = require("./ludoBoard");
+const {getNewFigurePosition} = require("./ludoBoard");
 const {getPathToNewPosition} = require("./ludoBoard");
 const {arrayOfPointsIncludes} = require("./helperFunctions");
 const {getHomePositions} = require("./ludoBoard");
@@ -112,7 +114,7 @@ const handlePossibleActions = (newValue, room, io, socket) => {
     }
 
     //set figure movement or next player
-    if (newValue === 6 || hasFiguresOnField(room.currentPlayer)) {
+    if(CanMovePlayer(room.currentPlayer, room.currentDiceValue)) {
         console.log("set figure moving");
         room.canCurrentPlayerRollDice = false;
         room.canCurrentPlayerMoveFigure = true;
@@ -120,6 +122,16 @@ const handlePossibleActions = (newValue, room, io, socket) => {
     } else {
         setNextPlayer(io, room);
     }
+
+    // //set figure movement or next player
+    // if (newValue === 6 || hasFiguresOnField(room.currentPlayer)) {
+    //     console.log("set figure moving");
+    //     room.canCurrentPlayerRollDice = false;
+    //     room.canCurrentPlayerMoveFigure = true;
+    //     sendGameState(io, room);
+    // } else {
+    //     setNextPlayer(io, room);
+    // }
 
 }
 
@@ -137,28 +149,39 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io, socket) => 
         return callback({ error: "Can not move figure. Figure not found" });
     }
 
-    if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
-        if(room.currentDiceValue === 6) {
-            console.log("move initial figure");
-            room.currentPlayer.positions.splice(figureIndex, 1);
-            room.currentPlayer.positions.push(getStartPosition(currentPlayerColor));
-            setNextPlayer(io, room);
-        } else {
-            console.log("Can not move this figure.");
-            return callback({ error: "Can not move this figure." });
-        }
+    const newPosition = getNewFigurePosition(room.currentDiceValue, currentPlayerColor, playerPosition);
+
+    if(newPosition.error) {
+        console.log(newPosition.error);
+        return callback(error);
     } else {
-        const result = getPathToNewPosition(playerPosition, room.currentDiceValue, currentPlayerColor)
-        if(result.error){
-            console.log("Can not move this figure.");
-            return callback({ error: "Can not move this figure." });
-        } else {
-            console.log("move figure in figure");
-            room.currentPlayer.positions.splice(figureIndex, 1);
-            room.currentPlayer.positions.push(result.path[result.path.length-1]);
-            setNextPlayer(io, room);
-        }
+        room.currentPlayer.positions.splice(figureIndex, 1);
+        room.currentPlayer.positions.push(newPosition.position);
+        setNextPlayer(io, room);
     }
+
+    // if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
+    //     if(room.currentDiceValue === 6) {
+    //         console.log("move initial figure");
+    //         room.currentPlayer.positions.splice(figureIndex, 1);
+    //         room.currentPlayer.positions.push(getStartPosition(currentPlayerColor));
+    //         setNextPlayer(io, room);
+    //     } else {
+    //         console.log("Can not move this figure.");
+    //         return callback({ error: "Can not move this figure." });
+    //     }
+    // } else {
+    //     const result = getPathToNewPosition(playerPosition, room.currentDiceValue, currentPlayerColor)
+    //     if(result.error){
+    //         console.log("Can not move this figure.");
+    //         return callback({ error: "Can not move this figure." });
+    //     } else {
+    //         console.log("move figure in figure");
+    //         room.currentPlayer.positions.splice(figureIndex, 1);
+    //         room.currentPlayer.positions.push(result.path[result.path.length-1]);
+    //         setNextPlayer(io, room);
+    //     }
+    // }
 
     callback();
 }
