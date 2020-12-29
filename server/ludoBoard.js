@@ -38,7 +38,7 @@ const getStopPosition = (playerColor) => {
         case PlayerColor.RED:
             return [5, 0];
         case PlayerColor.GREEN:
-            return [0, 5];
+            return [4, 9];
         case PlayerColor.YELLOW:
             return [5, 10];
         case PlayerColor.BLUE:
@@ -138,7 +138,9 @@ const getNextPlayer = (room) => {
         currentIndex = 0;
     }
     //skip inactive players and players that already won
-    while (!room.users[currentIndex].active || HasFinished(room.users[currentIndex])) {
+    let attempts = room.users.length;
+    while ((!room.users[currentIndex].active || HasFinished(room.users[currentIndex])) && attempts > 0) {
+        attempts--;
         currentIndex++;
         if(currentIndex === room.users.length){
             currentIndex = 0;

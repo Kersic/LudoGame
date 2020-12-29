@@ -20,6 +20,7 @@ import {PlayerColor} from "../../enums";
 import diceSound from '../../Sounds/dice.mp3';
 import kickSound from '../../Sounds/kick.mp3';
 import wonSound from '../../Sounds/won2.mp3';
+import ConfettiAnimation from "./ConfettiAnimation";
 
 const chatWrapperSize = 50;
 const infoBoxSizes = 70;
@@ -196,6 +197,8 @@ const Game = ({location}) => {
     const [diceEnabled, setDiceEnabled] = useState(true);
     const [canMoveFigures, setCanMoveFigures] = useState(false);
     const [gameMessage, setGameMessage] = useState("Roll a dice! Player with highest number starts");
+    const [kickPosition, setKickPosition] = useState(false);
+    const [confettiActive, setConfettiActive] = useState(false);
 
     //sounds
     const [PlayDiceSound] = useSound(diceSound, { volume: 0.5 });
@@ -257,13 +260,18 @@ const Game = ({location}) => {
             setGameMessage( message);
 
         });
-        socket.on('kickAnimation', () => {
-            console.log("kick animation");
+        socket.on('kickAnimation', (position) => {
+            console.log("kick animation " + position );
+            setKickPosition(position);
             PlayKickSound();
         });
 
         socket.on('wonAnimation', () => {
-            console.log("won animation")
+            console.log("won animation");
+            setConfettiActive(true);
+            setTimeout(function(){
+                setConfettiActive(false);
+            }, 2000);
             PlayWonSound();
         });
 
@@ -342,7 +350,10 @@ const Game = ({location}) => {
                     >
                         {redUser.username}
                     </div>}
-                    <div className={classes.gameMessage}>{gameMessage}</div>
+                    <div className={classes.gameMessage}>
+                        <ConfettiAnimation active={confettiActive} />
+                        {gameMessage}
+                    </div>
                     {greenUser &&
                     <div className={classNames(
                                 classes.topRight,
@@ -363,6 +374,7 @@ const Game = ({location}) => {
                         canRollDice={diceEnabled}
                         canMoveFigures={canMoveFigures}
                         movePlayer={movePlayer}
+                        kickPosition={kickPosition}
                     />
                 </div>
                 <div className={classes.sideBoxes}>
