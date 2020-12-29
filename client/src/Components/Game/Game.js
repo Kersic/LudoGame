@@ -198,6 +198,7 @@ const Game = ({location}) => {
     const [canMoveFigures, setCanMoveFigures] = useState(false);
     const [gameMessage, setGameMessage] = useState("Roll a dice! Player with highest number starts");
     const [kickPosition, setKickPosition] = useState(false);
+    const [winner, setWinner] = useState(false);
     const [confettiActive, setConfettiActive] = useState(false);
 
     //sounds
@@ -263,12 +264,12 @@ const Game = ({location}) => {
         socket.on('kickAnimation', (position) => {
             console.log("kick animation " + position );
             setKickPosition(position);
-            PlayKickSound();
         });
 
         socket.on('wonAnimation', () => {
             console.log("won animation");
             setConfettiActive(true);
+            setWinner(!winner);
             setTimeout(function(){
                 setConfettiActive(false);
             }, 2000);
@@ -285,6 +286,14 @@ const Game = ({location}) => {
         });
 
     }, []);
+
+    useEffect(() => {
+        PlayKickSound();
+    }, [kickPosition])
+
+    useEffect(() => {
+        PlayWonSound();
+    }, [winner])
 
     useEffect(() => {
         setRedUser(users.filter(user => user.color === PlayerColor.RED).length > 0 ? users.filter(user => user.color === PlayerColor.RED)[0] : null);
