@@ -119,7 +119,7 @@ const handlePossibleActions = (newValue, room, io) => {
     }
 
     //set figure movement or next player
-    if(CanMovePlayer(room.currentPlayer, room.currentDiceValue)) {
+    if(CanMovePlayer(room.currentPlayer, room.currentDiceValue, room)) {
         console.log("set figure moving");
         room.canCurrentPlayerRollDice = false;
         room.canCurrentPlayerMoveFigure = true;
@@ -144,7 +144,7 @@ const handleMove = (roomId, tokenUser, playerPosition, callback, io) => {
         return callback({ error: "Can not move figure. Figure not found" });
     }
 
-    const newPosition = getNewFigurePosition(room.currentDiceValue, currentPlayerColor, playerPosition);
+    const newPosition = getNewFigurePosition(room.currentDiceValue, currentPlayerColor, playerPosition, room);
 
     if(newPosition.error) {
         console.log(newPosition.error);

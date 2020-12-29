@@ -109,7 +109,7 @@ const WaitingLobby = ({location}) => {
                     logout();
                     return;
                 }
-                alert(error);
+                console.log(error);
             }
             getRooms();
         });
@@ -136,7 +136,7 @@ const WaitingLobby = ({location}) => {
         if((!socket || !socket.connected)) return;
         socket.emit('startGame', { roomId:id, token:getToken() }, (error) => {
             if(error) {
-                alert(error);
+                console.log(error);
                 getRooms();
             }
         });

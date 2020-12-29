@@ -214,7 +214,7 @@ const Game = ({location}) => {
                     logout();
                     return;
                 }
-                alert(error);
+                console.log(error);
             }
         });
         return () => socket.disconnect();

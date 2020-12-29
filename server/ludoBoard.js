@@ -94,7 +94,7 @@ const getPathToNewPosition = (startPosition, numOfMoves, playerColor) => {
     if(startIndex+numOfMoves >= playerPath.length)
         return {path: [], error: true}
 
-    for(let i = startIndex; i <= startIndex+numOfMoves; i++){
+    for(let i = startIndex+1; i <= startIndex+numOfMoves; i++){
         movePath.push(playerPath[i]);
     }
 
@@ -159,7 +159,7 @@ const HasFinished = (player) => {
     return hasWon;
 }
 
-const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
+const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition, room) => {
      if(arrayOfPointsIncludes(getInitialsPositions(currentPlayerColor),playerPosition)){
         if(diceVale === 6) {
             return {position:getStartPosition(currentPlayerColor), error: null}
@@ -168,10 +168,35 @@ const getNewFigurePosition = (diceVale, currentPlayerColor, playerPosition) => {
         }
     } else {
         const result = getPathToNewPosition(playerPosition, diceVale, currentPlayerColor)
+
+
+
         if(result.error){
             return {position: null, error: "Can not move this figure." };
         } else {
-            return {position:result.path[result.path.length-1], error: null}
+            //prevent moving past other figures
+
+            let pathToCheck = [];
+            for(let i = 0; i < result.path.length - 1; i++){
+                pathToCheck.push(result.path[i]);
+            }
+
+            let blockingFigure = false;
+            room.users.map((user) => {
+                user.positions.map(position => {
+                    if(arrayOfPointsIncludes(pathToCheck, position)){
+                        blockingFigure = true;
+                    }
+                })
+            })
+            if(blockingFigure) {
+                console.log("blocking figure");
+                return {position: null, error: "Can not jump over figure"};
+            }
+            else
+                return {position:result.path[result.path.length-1], error: null}
+
+            //return {position:result.path[result.path.length-1], error: null}
         }
     }
 }
@@ -180,10 +205,10 @@ const PlayerHasFigureOnField = (player, position) => {
     return arrayOfPointsIncludes(player.positions, position);
 }
 
-const CanMovePlayer = (player, diceValue) => {
+const CanMovePlayer = (player, diceValue, room) => {
     let canMovePlayer = false;
     player.positions.map(position => {
-        const newPosition = getNewFigurePosition(diceValue, player.color, position).position
+        const newPosition = getNewFigurePosition(diceValue, player.color, position, room).position
         if(newPosition !== null && !PlayerHasFigureOnField(player, newPosition)){
             canMovePlayer = true;
         }
