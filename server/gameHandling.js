@@ -38,10 +38,10 @@ const handleGame = (socket, io, roomId) => {
                     break;
 
             }
-            //player.positions = getInitialsPositions(player.color);
-            player.positions = getHomePositions(player.color);
-            player.positions.splice(1, 1);
-            player.positions.push(getStopPosition(player.color));
+            player.positions = getInitialsPositions(player.color);
+            // player.positions = getHomePositions(player.color);
+            // player.positions.splice(1, 1);
+            // player.positions.push(getStopPosition(player.color));
         })
         room.canCurrentPlayerRollDice = true;
         sendGameState(io, room);
@@ -62,7 +62,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     const { error, room } = isUserInRoom(roomId, tokenUser);
     if(error) return callback(error);
 
-    const newValue = 2//Math.floor(Math.random() * Math.floor(6) + 1);
+    const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
     console.log(tokenUser.username + " rolled " + newValue);
 
     let firstDiceValuesNum = 0

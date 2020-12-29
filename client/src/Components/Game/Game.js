@@ -178,6 +178,28 @@ const useStyles = createUseStyles({
 
 let socket;
 
+const SideBox = ({user, isCurrentPlayer, isActive}) => {
+    const classes = useStyles();
+    if(user)
+        return (
+            <div className={classNames(
+                user.color === PlayerColor.RED ? classes.topLeft : "",
+                user.color === PlayerColor.GREEN ? classes.topRight : "",
+                user.color === PlayerColor.YELLOW ? classes.bottomRight : "",
+                user.color === PlayerColor.BLUE ? classes.bottomLeft : "",
+
+                classes.nameBox,
+                isCurrentPlayer(user) ? classes.currentPlayer : "",
+                isActive(user) ? "" : classes.inactive,
+            )}
+            >
+                {user.username}
+            </div>
+        )
+    else
+        return <div/>
+}
+
 const Game = ({location}) => {
     const classes = useStyles();
     const {getToken, getUsername, logout} = useAuth();
@@ -349,30 +371,12 @@ const Game = ({location}) => {
             <div className={classes.logout} onClick={() => history.push('/')}>X</div>
             <div className={classes.leftColumn}>
                 <div className={classes.sideBoxes}>
-                    {redUser &&
-                    <div className={classNames(
-                                classes.topLeft,
-                                classes.nameBox,
-                                isCurrentPlayer(redUser) ? classes.currentPlayer : "",
-                                isActive(redUser) ? "" : classes.inactive,
-                            )}
-                    >
-                        {redUser.username}
-                    </div>}
+                    <SideBox user={redUser} isActive={isActive} isCurrentPlayer={isCurrentPlayer} />
                     <div className={classes.gameMessage}>
                         <ConfettiAnimation active={confettiActive} />
                         {gameMessage}
                     </div>
-                    {greenUser &&
-                    <div className={classNames(
-                                classes.topRight,
-                                classes.nameBox,
-                                isCurrentPlayer(greenUser) ? classes.currentPlayer : "",
-                                isActive(greenUser) ? "" : classes.inactive,
-                            )}
-                    >
-                        {greenUser.username}
-                    </div>}
+                    <SideBox user={greenUser} isActive={isActive} isCurrentPlayer={isCurrentPlayer} />
                 </div>
                 <div className={classes.paper}>
                     <LudoGame
@@ -387,27 +391,8 @@ const Game = ({location}) => {
                     />
                 </div>
                 <div className={classes.sideBoxes}>
-                    {blueUser &&
-                    <div className={classNames(
-                            classes.bottomLeft,
-                            classes.nameBox,
-                            isCurrentPlayer(blueUser) ? classes.currentPlayer : "",
-                            isActive(blueUser) ? "" : classes.inactive,
-                        )}
-                    >
-                        {blueUser.username}
-                    </div>}
-                    {!blueUser && <div/>}
-                    {yellowUser &&
-                    <div className={classNames(
-                            classes.bottomRight,
-                            classes.nameBox,
-                            isCurrentPlayer(yellowUser) ? classes.currentPlayer : "",
-                            isActive(yellowUser) ? "" : classes.inactive,
-                        )}
-                    >
-                        {yellowUser.username}
-                    </div>}
+                    <SideBox user={blueUser} isActive={isActive} isCurrentPlayer={isCurrentPlayer} />
+                    <SideBox user={yellowUser} isActive={isActive} isCurrentPlayer={isCurrentPlayer} />
                 </div>
             </div>
         </div>
