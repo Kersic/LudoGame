@@ -291,9 +291,10 @@ const Game = ({location}) => {
         socket.on('wonAnimation', () => {
             console.log("won animation");
             setConfettiActive(true);
-            setWinner(!winner);
+            setWinner(true);
             setTimeout(function(){
                 setConfettiActive(false);
+                setWinner(false);
             }, 2000);
             PlayWonSound();
         });
@@ -314,7 +315,7 @@ const Game = ({location}) => {
     }, [kickPosition])
 
     useEffect(() => {
-        PlayWonSound();
+        if(winner) PlayWonSound();
     }, [winner])
 
     useEffect(() => {

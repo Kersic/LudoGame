@@ -39,9 +39,9 @@ const handleGame = (socket, io, roomId) => {
 
             }
             player.positions = getInitialsPositions(player.color);
-            // player.positions = getHomePositions(player.color);
-            // player.positions.splice(1, 1);
-            // player.positions.push(getStopPosition(player.color));
+            //player.positions = getHomePositions(player.color);
+            //player.positions.splice(1, 1);
+            //player.positions.push(getStopPosition(player.color));
         })
         room.canCurrentPlayerRollDice = true;
         sendGameState(io, room);
