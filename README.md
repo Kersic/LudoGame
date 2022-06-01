@@ -2,7 +2,7 @@
 
 Ludo Game for School project.
 
-##### https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
+##### https://6297dfabf995b12bd890c69f--lucid-pare-7f85ac.netlify.app
 
 test accounts:<br />
 tadeja@gmail.com 12345678<br />
@@ -12,7 +12,7 @@ klemen@gmail.com 12345678<br />
 
 <hr/>
 
-APP: https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
+APP: https://6297dfabf995b12bd890c69f--lucid-pare-7f85ac.netlify.app/
 <br />
 run locally:
 - npm install
