@@ -27,4 +27,4 @@ mongoose.connect( process.env.MONGODB_URI || databaseCredentials,
     () => console.log('Connected to DB'));
 mongoose.Promise = global.Promise;
 
-server.listen(process.env.PORT || 5000, () => console.log(`Server has started.`));
+server.listen(process.env.PORT || 5001, () => console.log(`Server has started.`));
