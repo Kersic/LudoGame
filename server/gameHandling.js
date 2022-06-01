@@ -62,7 +62,7 @@ const rollDice = (roomId, tokenUser, callback, io, socket) => {
     const { error, room } = isUserInRoom(roomId, tokenUser);
     if(error) return callback(error);
 
-    const newValue = 1//Math.floor(Math.random() * Math.floor(6) + 1);
+    const newValue = Math.floor(Math.random() * Math.floor(6) + 1);
     console.log(tokenUser.username + " rolled " + newValue);
 
     let firstDiceValuesNum = 0
