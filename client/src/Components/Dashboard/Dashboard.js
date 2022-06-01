@@ -99,7 +99,7 @@ const Dashboard = () => {
                 {rooms.map((room, index) => (
                     <NavLink exact to={room.hasStarted ? "/" : `/waiting-lobby?id=${room.id}`} key={room.id} style={{backgroundColor: colors[index % colors.length]}} className={classes.gameBox}>
                         <div className={classes.roomName}>{room.name}</div>
-                        <div className={classes.roomUsers}>{room.users.filter(u => u.active).length + "/8" }</div>
+                        <div className={classes.roomUsers}>{room.users.filter(u => u.active).length + "/4" }</div>
                         <div className={classNames(classes.roomJoinButton, room.hasStarted ? classes.disabled : "")}>Join </div>
                     </NavLink>
                 ))}

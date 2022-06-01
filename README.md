@@ -2,6 +2,14 @@
 
 Ludo Game for School project.
 
+##### https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
+
+test accounts:
+tadeja@gmail.com 12345678
+maja@gmail.com 12345678
+saso@gmail.com 12345678
+klemen@gmail.com 12345678
+
 <hr/>
 
 APP: https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
