@@ -4,16 +4,15 @@ Ludo Game for School project.
 
 ##### https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
 
-test accounts:
-tadeja@gmail.com 12345678
-maja@gmail.com 12345678
-saso@gmail.com 12345678
-klemen@gmail.com 12345678
+test accounts:<br />
+tadeja@gmail.com 12345678<br />
+maja@gmail.com 12345678<br />
+saso@gmail.com 12345678<br />
+klemen@gmail.com 12345678<br />
 
 <hr/>
 
 APP: https://6297d7397aebe32100e525dc--lucid-pare-7f85ac.netlify.app
-
 <br />
 run locally:
 - npm install
@@ -38,7 +37,6 @@ run locally:
 - checkout heroku git: https://git.heroku.com/cryptic-temple-99770.git (git push heroku main)
 - Restart server: heroku restart
 - heroku logs: heroku logs --tail
-<hr/>
 
 <hr/>
 
