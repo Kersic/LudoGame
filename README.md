@@ -2,9 +2,10 @@
 
 Ludo Game for School project.
 
-##### https://6297dfabf995b12bd890c69f--lucid-pare-7f85ac.netlify.app
-
-test accounts:<br />
+You can try the game here: https://6297dfabf995b12bd890c69f--lucid-pare-7f85ac.netlify.app <br />
+You will need three accounts. You can use the accounts below. Please note that it may take more time on the first login because heroku server needs to wake up. <br />
+<br />
+Test accounts: <br />
 tadeja@gmail.com 12345678<br />
 maja@gmail.com 12345678<br />
 saso@gmail.com 12345678<br />
